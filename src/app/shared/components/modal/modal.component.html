@@ -1,0 +1,13 @@
+@if (isOpen) {
+  <div class="modal-backdrop" (click)="close()">
+    <div class="modal-dialog" [class]="'modal-' + size" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ title }}</h3>
+        <button class="close-btn" (click)="close()">X</button>
+      </div>
+      <div class="modal-body">
+        <ng-content></ng-content>
+      </div>
+    </div>
+  </div>
+}

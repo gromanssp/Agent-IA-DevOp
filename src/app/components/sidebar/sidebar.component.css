@@ -1,0 +1,21 @@
+.sidebar {
+  width: 260px;
+  background: var(--bg-surface);
+  border-right: var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  transition: width var(--transition-normal);
+}
+.sidebar.collapsed { width: 72px; }
+.sidebar-header { padding: 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+.sidebar-nav { padding: 0.5rem; flex: 1; }
+.nav-item {
+  display: block;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+.nav-item:hover { background: var(--bg-surface-hover); color: var(--text-primary); }
+.nav-item.active { color: var(--accent-primary); background: rgba(99, 102, 241, 0.1); }
+.toggle-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; }

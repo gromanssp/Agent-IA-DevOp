@@ -1,0 +1,85 @@
+<div class="chat-container">
+  <!-- Header -->
+  <div class="chat-header glass-panel">
+    <div class="header-info">
+      <div class="bot-avatar">
+        <span class="avatar-icon">⚡</span>
+        <span class="status-dot"></span>
+      </div>
+      <div>
+        <h2 class="heading-3">DevOps Agent</h2>
+        <span class="text-small">CubePath · Gestión de infraestructura</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div class="messages-area" #messagesContainer>
+    @for (msg of messages(); track msg.id) {
+      <div class="message-row" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
+        @if (msg.role === 'assistant') {
+          <div class="msg-avatar">⚡</div>
+        }
+        <div class="message-bubble" [class.user-bubble]="msg.role === 'user'" [class.bot-bubble]="msg.role === 'assistant'" [class.error-bubble]="msg.role === 'assistant' && msg.content.startsWith('Error:')">
+          @if (msg.loading) {
+            <div class="typing-indicator">
+              <span></span><span></span><span></span>
+            </div>
+          } @else {
+            <p class="message-text">{{ msg.content }}</p>
+            @if (msg.action && !msg.confirmPending) {
+              <app-vps-card [action]="msg.action"></app-vps-card>
+            }
+          }
+          <span class="message-time">{{ msg.timestamp | date:'HH:mm' }}</span>
+        </div>
+      </div>
+    }
+
+    <!-- Suggestions -->
+    @if (showSuggestions()) {
+      <div class="suggestions">
+        <p class="text-small suggestions-label">Prueba con alguna de estas:</p>
+        <div class="suggestions-grid">
+          @for (s of suggestions; track s) {
+            <button class="suggestion-chip" (click)="useSuggestion(s)">{{ s }}</button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Confirm dialog -->
+  @if (pendingConfirm(); as pending) {
+    <app-confirm-dialog
+      [action]="pending.action.action"
+      [vpsName]="pending.action.vps_name ?? pending.action.vps_id ?? 'desconocido'"
+      [message]="pending.action.user_message"
+      (confirmed)="onConfirm($event)">
+    </app-confirm-dialog>
+  }
+
+  <!-- Input -->
+  <div class="chat-input-area glass-panel">
+    <div class="input-wrapper">
+      <input
+        #messageInput
+        type="text"
+        class="chat-input"
+        [(ngModel)]="inputText"
+        (keydown)="onKeydown($event)"
+        placeholder="Escribe un comando... ej: '¿cuántos VPS tengo?'"
+        [disabled]="isLoading() || pendingConfirm() !== null"
+        autocomplete="off">
+      <button
+        class="send-btn"
+        (click)="sendMessage()"
+        [disabled]="!inputText.trim() || isLoading() || pendingConfirm() !== null">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>

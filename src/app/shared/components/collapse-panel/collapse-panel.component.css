@@ -1,0 +1,14 @@
+.collapse-panel { overflow: hidden; }
+.collapse-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: 1rem;
+  cursor: pointer;
+}
+.collapse-body { padding: 0 1.25rem 1rem; color: var(--text-secondary); }

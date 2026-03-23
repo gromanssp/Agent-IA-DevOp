@@ -1,0 +1,30 @@
+<div class="page-container">
+  <header class="page-header"><h1 class="heading-2">Profile</h1><p class="text-body">Manage your account information.</p></header>
+  <div class="glass-panel profile-card">
+    <div class="avatar-section">
+      <div class="avatar">
+        @if (displayName) { <span class="avatar-initials">{{ displayName | slice:0:2 | uppercase }}</span> }
+        @else { <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="avatar-icon"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg> }
+      </div>
+      <h2 class="avatar-name">{{ displayName || 'User' }}</h2>
+      <p class="avatar-email">{{ email || 'Not signed in' }}</p>
+    </div>
+    <div class="form-section">
+      <div class="form-group"><label class="form-label">Display Name</label><input type="text" class="form-control" [(ngModel)]="displayName" placeholder="Your name" /></div>
+      <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-control" [(ngModel)]="email" placeholder="your@email.com" /></div>
+      <div class="form-actions"><button class="btn btn-gradient" (click)="saveProfile()">Save Profile</button>@if (saveStatus === 'saved') { <span class="status-success">Profile saved!</span> }</div>
+    </div>
+    <div class="separator"></div>
+    <div class="form-section">
+      <h3 class="section-title">Change Password</h3>
+      <div class="form-group"><label class="form-label">Current Password</label><input type="password" class="form-control" [(ngModel)]="currentPassword" /></div>
+      <div class="form-group"><label class="form-label">New Password</label><input type="password" class="form-control" [(ngModel)]="newPassword" /></div>
+      <div class="form-group"><label class="form-label">Confirm New Password</label><input type="password" class="form-control" [(ngModel)]="confirmPassword" /></div>
+      <div class="form-actions">
+        <button class="btn btn-gradient" (click)="savePassword()">Update Password</button>
+        @if (passwordStatus === 'saved') { <span class="status-success">Password updated!</span> }
+        @if (passwordStatus === 'mismatch') { <span class="status-error">Passwords do not match.</span> }
+      </div>
+    </div>
+  </div>
+</div>

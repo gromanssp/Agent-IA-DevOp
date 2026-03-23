@@ -1,0 +1,29 @@
+<div class="confirm-overlay">
+  <div class="confirm-card glass-panel">
+    <div class="confirm-icon" [class.danger]="isDangerous">
+      @if (isDangerous) {
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      } @else {
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+      }
+    </div>
+    <h3 class="confirm-title">Confirmar: {{ actionLabel }}</h3>
+    <p class="confirm-desc">
+      ¿Estás seguro de que quieres <strong>{{ actionLabel | lowercase }}</strong> el servidor <strong>{{ vpsName }}</strong>?
+    </p>
+    @if (message) {
+      <p class="confirm-message text-small">{{ message }}</p>
+    }
+    <div class="confirm-actions">
+      <button class="btn btn-cancel" (click)="cancel()">Cancelar</button>
+      <button class="btn" [class.btn-danger]="isDangerous" [class.btn-gradient]="!isDangerous" (click)="confirm()">
+        {{ actionLabel }}
+      </button>
+    </div>
+  </div>
+</div>

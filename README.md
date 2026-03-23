@@ -1,6 +1,6 @@
-# Groman2 Template
+# Agent-IA-DevOp
 
-A modern Angular 21 dashboard template with dark glassmorphism design.
+A modern Angular 21 Chat where user write with natural language.
 
 ## Quick Start
 
@@ -32,4 +32,3 @@ Open http://localhost:4200
 - TypeScript 5.9
 - Chart.js 4 + ng2-charts 10
 - CSS Custom Properties
-# Agent-IA-DevOp

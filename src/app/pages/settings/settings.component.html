@@ -1,0 +1,33 @@
+<div class="page-container">
+  <header class="page-header"><h1 class="heading-2">Settings</h1><p class="text-body">Customize your application preferences.</p></header>
+  <div class="glass-panel settings-card">
+    <h3 class="section-title">Dark Navbar</h3><p class="section-desc">Standard dark navigation bar with colored accents.</p>
+    <div class="swatch-grid">
+      @for (theme of darkNavbarThemes; track theme.key) {
+        <label class="swatch-card" [class.selected]="selectedTheme === theme.key">
+          <input type="radio" name="theme" [value]="theme.key" [checked]="selectedTheme === theme.key" (change)="selectTheme(theme.key)" class="swatch-radio" />
+          <div class="swatch-preview-wrapper">
+            <div class="swatch-nav-preview dark-nav"><span class="nav-dot" [style.background]="theme.primary"></span><span class="nav-line"></span><span class="nav-line short"></span></div>
+            <div class="swatch-color" [style.background]="theme.primary"></div>
+          </div>
+          <span class="swatch-name">{{ theme.name }}</span>
+        </label>
+      }
+    </div>
+  </div>
+  <div class="glass-panel settings-card">
+    <h3 class="section-title">Colored Navbar</h3><p class="section-desc">Navigation bar uses the accent color with white contrast elements.</p>
+    <div class="swatch-grid">
+      @for (theme of coloredNavbarThemes; track theme.key) {
+        <label class="swatch-card" [class.selected]="selectedTheme === theme.key">
+          <input type="radio" name="theme" [value]="theme.key" [checked]="selectedTheme === theme.key" (change)="selectTheme(theme.key)" class="swatch-radio" />
+          <div class="swatch-preview-wrapper">
+            <div class="swatch-nav-preview" [style.background]="'linear-gradient(135deg, ' + theme.primary + ', ' + theme.secondary + ')'"><span class="nav-dot white-dot"></span><span class="nav-line white-line"></span><span class="nav-line short white-line"></span></div>
+            <div class="swatch-color" [style.background]="theme.primary"></div>
+          </div>
+          <span class="swatch-name">{{ theme.name }}</span>
+        </label>
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,16 @@
+<div class="carousel" (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
+  <div class="carousel-track" [style.transform]="translateX()">
+    @for (img of images(); track img.src) {
+      <div class="carousel-slide"><img [src]="img.src" [alt]="img.alt" loading="lazy" /></div>
+    }
+  </div>
+  @if (totalSlides() > 1) {
+    <button class="carousel-btn carousel-btn-prev" (click)="prev()" aria-label="Previous"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+    <button class="carousel-btn carousel-btn-next" (click)="next()" aria-label="Next"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
+    <div class="carousel-indicators">
+      @for (img of images(); track img.src; let i = $index) {
+        <button class="carousel-dot" [class.active]="i === currentIndex()" (click)="goTo(i)"></button>
+      }
+    </div>
+  }
+</div>

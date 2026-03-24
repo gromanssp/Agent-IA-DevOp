@@ -1,7 +1,0 @@
-.table-wrapper { overflow-x: auto; padding: 1rem; }
-table { width: 100%; border-collapse: collapse; }
-th, td { padding: 0.75rem; text-align: left; }
-th { color: var(--text-secondary); font-weight: 500; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
-td { border-bottom: 1px solid rgba(255, 255, 255, 0.03); }
-.striped tbody tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
-.hover tbody tr:hover { background: var(--bg-surface-hover); }

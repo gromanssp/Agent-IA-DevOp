@@ -1,20 +1,19 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable, signal, computed } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class SidebarService {
-  private collapsedSubject = new BehaviorSubject<boolean>(false);
-  private mobileOpenSubject = new BehaviorSubject<boolean>(false);
+  private _collapsed = signal(false);
+  private _mobileOpen = signal(false);
 
-  collapsed$ = this.collapsedSubject.asObservable();
-  mobileOpen$ = this.mobileOpenSubject.asObservable();
+  collapsed = this._collapsed.asReadonly();
+  mobileOpen = this._mobileOpen.asReadonly();
 
-  get isCollapsed(): boolean { return this.collapsedSubject.value; }
+  isCollapsed = computed(() => this._collapsed());
 
-  toggle(): void { this.collapsedSubject.next(!this.collapsedSubject.value); }
-  collapse(): void { this.collapsedSubject.next(true); }
-  expand(): void { this.collapsedSubject.next(false); }
-  toggleMobile(): void { this.mobileOpenSubject.next(!this.mobileOpenSubject.value); }
-  openMobile(): void { this.mobileOpenSubject.next(true); }
-  closeMobile(): void { this.mobileOpenSubject.next(false); }
+  toggle(): void { this._collapsed.update(v => !v); }
+  collapse(): void { this._collapsed.set(true); }
+  expand(): void { this._collapsed.set(false); }
+  toggleMobile(): void { this._mobileOpen.update(v => !v); }
+  openMobile(): void { this._mobileOpen.set(true); }
+  closeMobile(): void { this._mobileOpen.set(false); }
 }

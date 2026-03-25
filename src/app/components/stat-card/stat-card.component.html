@@ -1,12 +1,12 @@
 <div class="stat-card glass-panel">
   <div class="stat-header">
-    <span class="stat-title">{{ title }}</span>
-    <div class="stat-icon" [innerHTML]="icon"></div>
+    <span class="stat-title">{{ title() }}</span>
+    <div class="stat-icon" [innerHTML]="icon()"></div>
   </div>
-  <div class="stat-value">{{ value }}</div>
-  @if (trend !== 0) {
-    <span class="stat-trend" [class.positive]="trend > 0" [class.negative]="trend < 0">
-      {{ trend > 0 ? '+' : '' }}{{ trend }}%
+  <div class="stat-value">{{ value() }}</div>
+  @if (trend() !== 0) {
+    <span class="stat-trend" [class.positive]="trend() > 0" [class.negative]="trend() < 0">
+      {{ trend() > 0 ? '+' : '' }}{{ trend() }}%
     </span>
   }
 </div>

@@ -1,17 +1,18 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { SidebarService } from '../../services/sidebar.service';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-sidebar',
+  standalone: true,
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css',
-  imports: [RouterLink, RouterLinkActive, AsyncPipe]
+  imports: [RouterLink, RouterLinkActive],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SidebarComponent {
   private sidebarService = inject(SidebarService);
-  collapsed$ = this.sidebarService.collapsed$;
+  collapsed = this.sidebarService.collapsed;
 
   toggle(): void {
     this.sidebarService.toggle();

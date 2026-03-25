@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import { Component, inject, signal, computed, viewChild, ElementRef, AfterViewChecked, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { AgentService } from '../../services/agent.service';
@@ -8,13 +8,15 @@ import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-
 
 @Component({
   selector: 'app-chat',
+  standalone: true,
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
-  imports: [FormsModule, DatePipe, VpsCardComponent, ConfirmDialogComponent]
+  imports: [FormsModule, DatePipe, VpsCardComponent, ConfirmDialogComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChatComponent implements AfterViewChecked {
-  @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
-  @ViewChild('messageInput') private messageInput!: ElementRef;
+  private messagesContainer = viewChild<ElementRef>('messagesContainer');
+  private messageInput = viewChild<ElementRef>('messageInput');
 
   private agentService = inject(AgentService);
 
@@ -168,7 +170,7 @@ export class ChatComponent implements AfterViewChecked {
   }
 
   private scrollToBottom(): void {
-    const el = this.messagesContainer?.nativeElement;
+    const el = this.messagesContainer()?.nativeElement;
     if (el) {
       el.scrollTop = el.scrollHeight;
     }

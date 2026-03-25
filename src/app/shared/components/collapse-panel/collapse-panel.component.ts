@@ -1,14 +1,15 @@
-import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input, signal, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-collapse-panel',
+  standalone: true,
   template: `
     <div class="collapse-panel glass-panel">
-      <button class="collapse-header" (click)="expanded = !expanded">
-        <span>{{ title }}</span>
-        <span>{{ expanded ? '-' : '+' }}</span>
+      <button class="collapse-header" (click)="expanded.set(!expanded())">
+        <span>{{ title() }}</span>
+        <span>{{ expanded() ? '-' : '+' }}</span>
       </button>
-      @if (expanded) {
+      @if (expanded()) {
         <div class="collapse-body"><ng-content></ng-content></div>
       }
     </div>
@@ -17,6 +18,6 @@ import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CollapsePanelComponent {
-  @Input() title = '';
-  @Input() expanded = false;
+  title = input('');
+  expanded = signal(false);
 }

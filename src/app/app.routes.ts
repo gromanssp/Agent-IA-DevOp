@@ -1,16 +1,13 @@
 import { Routes } from '@angular/router';
-import { DashboardComponent } from './layouts/dashboard/dashboard.component';
-import { ChatComponent } from './pages/chat/chat.component';
-import { NotFoundComponent } from './pages/not-found/not-found.component';
 
 export const routes: Routes = [
   {
     path: '',
-    component: DashboardComponent,
+    loadComponent: () => import('./layouts/dashboard/dashboard.component').then(m => m.DashboardComponent),
     children: [
       { path: '', redirectTo: 'chat', pathMatch: 'full' },
-      { path: 'chat', component: ChatComponent }
+      { path: 'chat', loadComponent: () => import('./pages/chat/chat.component').then(m => m.ChatComponent) }
     ]
   },
-  { path: '**', component: NotFoundComponent }
+  { path: '**', loadComponent: () => import('./pages/not-found/not-found.component').then(m => m.NotFoundComponent) }
 ];

@@ -13,4 +13,4 @@ FROM nginx:alpine
 
 COPY nginx.conf /etc/nginx/nginx.conf
 
-COPY --from=build /app/dist/agent-ia /usr/share/nginx/html
+COPY --from=build /app/dist/agent-ia/browser /usr/share/nginx/html

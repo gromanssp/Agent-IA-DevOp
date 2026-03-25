@@ -5,17 +5,108 @@
   display: flex;
   flex-direction: column;
   transition: width var(--transition-normal);
+  overflow: hidden;
 }
-.sidebar.collapsed { width: 72px; }
-.sidebar-header { padding: 1.5rem; display: flex; align-items: center; justify-content: space-between; }
-.sidebar-nav { padding: 0.5rem; flex: 1; }
+
+.sidebar.collapsed {
+  width: 72px;
+}
+
+/* Header */
+.sidebar-header {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+}
+
+.sidebar-logo {
+  white-space: nowrap;
+  opacity: 1;
+  transition: opacity var(--transition-fast);
+}
+
+.sidebar.collapsed .sidebar-logo {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Toggle button */
+.toggle-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.toggle-btn:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+.toggle-btn svg {
+  transition: transform var(--transition-normal);
+}
+
+.sidebar.collapsed .toggle-btn svg {
+  transform: rotate(180deg);
+}
+
+/* Navigation */
+.sidebar-nav {
+  padding: 0.5rem;
+  flex: 1;
+}
+
 .nav-item {
-  display: block;
+  display: flex;
+  align-items: center;
   padding: 0.75rem 1rem;
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
   transition: all var(--transition-fast);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
 }
-.nav-item:hover { background: var(--bg-surface-hover); color: var(--text-primary); }
-.nav-item.active { color: var(--accent-primary); background: rgba(99, 102, 241, 0.1); }
-.toggle-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; }
+
+.nav-item:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+.nav-item.active {
+  color: var(--accent-primary);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.nav-icon {
+  flex-shrink: 0;
+}
+
+.nav-label {
+  margin-left: 10px;
+  opacity: 1;
+  transition: opacity var(--transition-fast);
+}
+
+.sidebar.collapsed .nav-label {
+  opacity: 0;
+}
+
+.sidebar.collapsed .nav-item {
+  justify-content: center;
+  padding: 0.75rem;
+}
+
+.sidebar.collapsed .nav-icon {
+  margin: 0;
+}

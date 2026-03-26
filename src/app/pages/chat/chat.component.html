@@ -16,18 +16,20 @@
   <!-- Messages -->
   <div class="messages-area" #messagesContainer>
     @for (msg of messages(); track msg.id) {
-      <div class="message-row" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
-        @if (msg.role === 'assistant') {
+      <div class="message-row" [class.user]="msg.role === ChatRole.USER" [class.assistant]="msg.role === ChatRole.ASSISTANT">
+        @if (msg.role === ChatRole.ASSISTANT) {
           <div class="msg-avatar">⚡</div>
         }
-        <div class="message-bubble" [class.user-bubble]="msg.role === 'user'" [class.bot-bubble]="msg.role === 'assistant'" [class.error-bubble]="msg.role === 'assistant' && msg.content.startsWith('Error:')">
+        <div class="message-bubble" [class.user-bubble]="msg.role === ChatRole.USER" [class.bot-bubble]="msg.role === ChatRole.ASSISTANT" [class.error-bubble]="msg.role === ChatRole.ASSISTANT && msg.content.startsWith('Error:')">
           @if (msg.loading) {
             <div class="typing-indicator">
               <span></span><span></span><span></span>
             </div>
           } @else {
             <p class="message-text">{{ msg.content }}</p>
-            @if (msg.action && !msg.confirmPending) {
+            @if (msg.vpsData) {
+              <app-vps-list [vpsList]="msg.vpsData"></app-vps-list>
+            } @else if (msg.action && !msg.confirmPending && msg.action.action !== VpsAction.UNKNOWN) {
               <app-vps-card [action]="msg.action"></app-vps-card>
             }
           }

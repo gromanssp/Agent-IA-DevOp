@@ -1,0 +1,25 @@
+<div class="vps-list">
+  @for (vps of vpsList(); track vps.id) {
+    <div class="vps-item">
+      <div class="vps-header">
+        <span class="vps-name">{{ vps.name }}</span>
+        <app-badge [variant]="statusVariant(vps.status)" size="sm">{{ vps.status }}</app-badge>
+      </div>
+      <div class="vps-details">
+        <span class="vps-detail"><span class="detail-label">IP</span> {{ vps.ip }}</span>
+        <span class="vps-detail"><span class="detail-label">Plan</span> {{ vps.plan }}</span>
+        <span class="vps-detail"><span class="detail-label">Ubicacion</span> {{ vps.location }}</span>
+        @if (vps.cpu) {
+          <span class="vps-detail"><span class="detail-label">CPU</span> {{ vps.cpu }}</span>
+        }
+        @if (vps.ram) {
+          <span class="vps-detail"><span class="detail-label">RAM</span> {{ vps.ram }}</span>
+        }
+        @if (vps.disk) {
+          <span class="vps-detail"><span class="detail-label">Disco</span> {{ vps.disk }}</span>
+        }
+      </div>
+      <span class="vps-id">ID: {{ vps.id }}</span>
+    </div>
+  }
+</div>

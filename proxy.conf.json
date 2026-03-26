@@ -1,0 +1,18 @@
+{
+  "/api/webhook/": {
+    "target": "https://vps22899.cubepath.net",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api/webhook/": "/webhook/"
+    }
+  },
+  "/api/webhook-test/": {
+    "target": "https://vps22899.cubepath.net",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api/webhook-test/": "/webhook-test/"
+    }
+  }
+}

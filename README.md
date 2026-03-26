@@ -1,125 +1,144 @@
-# Agent-IA-DevOp
+# Agent-IA-DevOps
 
-A modern Angular 21 chat application that allows users to manage VPS infrastructure through natural language conversations (Spanish). An AI agent powered by N8n webhooks interprets commands and executes server operations like rebooting, monitoring, and power management.
+> Asistente DevOps conversacional para gestionar infraestructura VPS de CubePath mediante lenguaje natural.
 
-## Quick Start
+![Angular](https://img.shields.io/badge/Angular-21-DD0031?logo=angular)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript)
+![n8n](https://img.shields.io/badge/n8n-Webhook-EA4B71?logo=n8n)
+![License](https://img.shields.io/badge/License-MIT-green)
+
+---
+
+## Inicio rapido
 
 ```bash
+# Instalar dependencias
 npm install
-ng serve
+
+# Desarrollo
+npm start
+# → http://localhost:4200
+
+# Build produccion
+npm run build
 ```
 
-Open http://localhost:4200
+---
 
-## Tech Stack
+## Stack tecnologico
 
-| Category | Technology | Version |
-|----------|-----------|---------|
+| Categoria | Tecnologia | Version |
+|-----------|-----------|---------|
 | Framework | Angular | 21.2.4 |
-| Language | TypeScript | 5.9 |
-| Reactive | RxJS | 7.8.0 |
+| Lenguaje | TypeScript | 5.9 |
+| Reactivo | RxJS | 7.8.0 |
 | Charts | Chart.js + ng2-charts | 4.3 / 10.0 |
-| Styling | CSS Custom Properties + Glassmorphism | — |
-| Font | Google Fonts (Outfit) | — |
-| Backend | N8n Webhook | — |
+| UI | CSS Custom Properties + Glassmorphism | — |
+| Backend | n8n Webhook (AI Agent) | — |
 | Testing | Karma + Jasmine | 6.4 / 5.2 |
-| Build | Angular CLI | 21.2.2 |
 
-## Architecture Flow
+---
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        User (Browser)                       │
-│                                                             │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │              ChatComponent (Angular 21)                │  │
-│  │  - Captures natural language input                     │  │
-│  │  - Maintains conversation history (last 10 messages)   │  │
-│  │  - Renders messages, VPS cards, confirm dialogs        │  │
-│  └──────────────────────┬────────────────────────────────┘  │
-│                         │                                    │
-│                         ▼                                    │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │                   AgentService                         │  │
-│  │  - sendMessage()     → POST /webhook/chat              │  │
-│  │  - confirmAction()   → POST /webhook/chat (confirmed)  │  │
-│  └──────────────────────┬────────────────────────────────┘  │
-└─────────────────────────┼────────────────────────────────────┘
-                          │ HTTP POST
-                          ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    N8n Webhook Server                        │
-│                                                             │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │  /webhook/chat                                         │  │
-│  │  - Receives user message + conversation context        │  │
-│  │  - Processes with LLM (AI Agent)                       │  │
-│  │  - Returns structured N8nResponse:                     │  │
-│  │      { output, action?, vps_id?, confirm_required? }   │  │
-│  └──────────────────────┬────────────────────────────────┘  │
-└─────────────────────────┼────────────────────────────────────┘
-                          │ JSON Response
-                          ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   Response Handling                          │
-│                                                             │
-│  ┌─ confirm_required? ──────────┐                           │
-│  │  YES → ConfirmDialogComponent│                           │
-│  │         User confirms/cancels│                           │
-│  │         ↓ (if confirmed)     │                           │
-│  │         AgentService.confirm │                           │
-│  └──────────────────────────────┘                           │
-│                                                             │
-│  ┌─ action present? ────────────┐                           │
-│  │  YES → VpsCardComponent      │                           │
-│  │         Shows action + VPS ID│                           │
-│  └──────────────────────────────┘                           │
-│                                                             │
-│  ┌─ default ────────────────────┐                           │
-│  │  Display AI response message │                           │
-│  └──────────────────────────────┘                           │
-└─────────────────────────────────────────────────────────────┘
-```
-
-## Project Structure
+## Arquitectura
 
 ```
-src/
-├── app/
-│   ├── models/
-│   │   └── agent.models.ts           # ChatMessage, N8nRequest/Response, VpsInfo
-│   ├── services/
-│   │   ├── agent.service.ts          # N8n webhook HTTP communication
-│   │   ├── theme.service.ts          # 12-color theme system
-│   │   └── sidebar.service.ts        # Sidebar UI state
-│   ├── pages/
-│   │   ├── chat/                     # Main AI chat interface
-│   │   └── not-found/                # 404 page
-│   ├── layouts/
-│   │   └── dashboard.component.ts    # Main layout (sidebar + navbar + content)
-│   ├── components/
-│   │   ├── sidebar/                  # Collapsible navigation sidebar
-│   │   ├── navbar/                   # Header with theme switching
-│   │   ├── vps-card/                 # VPS action result display
-│   │   ├── confirm-dialog/           # Dangerous action confirmation
-│   │   └── stat-card/                # Statistics display
-│   ├── shared/components/            # 10 reusable UI components
-│   ├── directives/                   # Tooltip & Collapse directives
-│   └── environments/                 # Environment config
-├── styles.css                        # Global styles & design system
-└── index.html                        # Entry point
+Usuario (Chat)
+    │
+    ▼
+┌─────────────────────────┐
+│  ChatComponent          │  Captura input, renderiza mensajes,
+│  (Angular Signals)      │  VPS cards y dialogs de confirmacion
+└────────┬────────────────┘
+         │ AgentService.sendMessage()
+         ▼
+┌─────────────────────────┐
+│  AgentService           │  Normaliza respuestas de n8n:
+│  normalizeResponse()    │  arrays, wrappers {json:}, output strings
+└────────┬────────────────┘
+         │ HTTP POST
+         ▼
+┌─────────────────────────┐
+│  n8n Webhook            │  AI Agent procesa el mensaje,
+│  /webhook/devops-agent  │  ejecuta acciones via API CubePath
+└────────┬────────────────┘
+         │ JSON Response
+         ▼
+┌─────────────────────────┐
+│  Flujo de respuesta     │
+│                         │
+│  confirm_required?      │
+│  ├─ SI → ConfirmDialog  │
+│  └─ NO → VpsCard /      │
+│          VpsList         │
+└─────────────────────────┘
 ```
 
-## Features
+---
 
-- **Natural Language Chat** — Interact with VPS servers using conversational Spanish
-- **Confirmation Dialogs** — Double-check for dangerous operations (reboot, delete, power off)
-- **VPS Action Cards** — Visual display of server operation results
-- **Dark Glassmorphism UI** — Modern frosted glass aesthetic with backdrop blur
-- **12 Color Themes** — 6 dark navbar + 6 colored navbar variants
-- **Signal-based State** — Angular 21 signals for reactive state management
-- **Standalone Components** — No NgModules, fully standalone architecture
-- **OnPush Change Detection** — Performance optimized across all components
-- **Suggestion Chips** — Preset command examples when chat is empty
-- **10 Reusable Components** — Badge, Modal, Collapse, Progress, Table, Code Snippet, Spinner, Date Picker, Carousel
-- **Chart.js Integration** — Data visualization ready
+## Estructura del proyecto
+
+```
+src/app/
+├── models/
+│   ├── index.ts              # Barrel export
+│   ├── enums.ts              # VpsAction, VpsStatus, ChatRole, IpType
+│   ├── vps-api.model.ts      # DTOs de la API CubePath (VpsApiItem, VpsPlanDto...)
+│   ├── vps.model.ts          # Modelo de dominio (VpsInfo)
+│   ├── vps.mapper.ts         # mapVpsApiToInfo(), isVpsApiItem(), isVpsApiList()
+│   └── chat.model.ts         # ChatMessage, AgentRequest, AgentResponse
+├── services/
+│   ├── agent.service.ts      # Comunicacion con n8n + normalizacion
+│   ├── theme.service.ts      # Sistema de 12 temas de color
+│   └── sidebar.service.ts    # Estado del sidebar
+├── pages/
+│   ├── chat/                 # Interfaz principal de chat
+│   └── not-found/            # Pagina 404
+├── layouts/
+│   └── dashboard.component   # Layout principal (sidebar + navbar + content)
+├── components/
+│   ├── sidebar/              # Navegacion colapsable
+│   ├── navbar/               # Header con cambio de tema
+│   ├── vps-card/             # Card de accion individual
+│   ├── vps-list/             # Lista de VPS con detalle completo
+│   ├── confirm-dialog/       # Confirmacion de acciones peligrosas
+│   └── stat-card/            # Tarjeta de estadisticas
+├── shared/components/        # 10 componentes reutilizables
+└── directives/               # Tooltip, Collapse
+```
+
+---
+
+## Funcionalidades
+
+- **Chat en lenguaje natural** — Gestiona servidores VPS conversando en espanol
+- **Deteccion de datos de API** — Reconoce automaticamente respuestas crudas de CubePath y las mapea a modelos de dominio
+- **Confirmacion de acciones peligrosas** — Dialogo de seguridad para reboot, delete y power off
+- **Lista de VPS** — Visualizacion detallada con IP, plan, ubicacion, OS, CPU, RAM y disco
+- **Normalizacion de respuestas** — Maneja arrays anidados, wrappers `{json: ...}` y strings de n8n
+- **UI Glassmorphism oscuro** — Estetica moderna con frosted glass y backdrop blur
+- **12 temas de color** — 6 navbar oscuro + 6 navbar de color
+- **Angular Signals** — Estado reactivo sin Zone.js overhead
+- **Standalone Components** — Arquitectura sin NgModules
+- **OnPush Change Detection** — Rendimiento optimizado en todos los componentes
+- **Componentes reutilizables** — Badge, Modal, Collapse, Progress, Table, Code Snippet, Spinner, Date Picker, Carousel
+
+---
+
+## Variables de entorno
+
+| Variable | Descripcion | Default |
+|----------|-------------|---------|
+| `n8nWebhookUrl` | URL del webhook de n8n | `/api/webhook-test/devops-agent` |
+
+Configuracion en `src/environments/environment.ts` y `environment.prod.ts`.
+
+---
+
+## Scripts
+
+| Comando | Descripcion |
+|---------|-------------|
+| `npm start` | Servidor de desarrollo |
+| `npm run build` | Build de produccion |
+| `npm run watch` | Build en modo watch |
+| `npm test` | Ejecutar tests |

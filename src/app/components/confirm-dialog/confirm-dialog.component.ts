@@ -1,5 +1,6 @@
 import { Component, input, output, computed, ChangeDetectionStrategy } from '@angular/core';
 import { LowerCasePipe } from '@angular/common';
+import { VpsAction } from '../../models';
 
 @Component({
   selector: 'app-confirm-dialog',
@@ -10,22 +11,26 @@ import { LowerCasePipe } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ConfirmDialogComponent {
-  action = input.required<string>();
+  action = input.required<VpsAction>();
   vpsName = input.required<string>();
   message = input('');
   confirmed = output<boolean>();
 
   isDangerous = computed(() =>
-    ['power_off', 'delete', 'reboot'].includes(this.action())
+    [VpsAction.POWER_OFF, VpsAction.DELETE, VpsAction.REBOOT].includes(this.action())
   );
 
   actionLabel = computed(() => {
-    const labels: Record<string, string> = {
-      reboot: 'Reiniciar',
-      power_off: 'Apagar',
-      power_on: 'Encender',
-      delete: 'Eliminar',
-      create: 'Crear'
+    const labels: Record<VpsAction, string> = {
+      [VpsAction.REBOOT]: 'Reiniciar',
+      [VpsAction.POWER_OFF]: 'Apagar',
+      [VpsAction.POWER_ON]: 'Encender',
+      [VpsAction.DELETE]: 'Eliminar',
+      [VpsAction.CREATE]: 'Crear',
+      [VpsAction.LIST_VPS]: 'Listar',
+      [VpsAction.GET_VPS]: 'Consultar',
+      [VpsAction.STATUS]: 'Estado',
+      [VpsAction.UNKNOWN]: 'Desconocido',
     };
     return labels[this.action()] ?? this.action();
   });

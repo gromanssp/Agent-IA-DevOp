@@ -9,36 +9,33 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --legacy-peer-deps
 
-# Copiar fuentes
+# Copiar fuentes (incluye .env que Dokploy inyecta antes del build)
 COPY . .
 
-# --- Inyectar variables de entorno en environment.prod.ts ---
-# Dokploy las inyecta como ARG en build-time.
-ARG FIREBASE_API_KEY
-ARG FIREBASE_AUTH_DOMAIN
-ARG FIREBASE_PROJECT_ID
-ARG FIREBASE_STORAGE_BUCKET
-ARG FIREBASE_MESSAGING_SENDER_ID
-ARG FIREBASE_APP_ID
-ARG FIREBASE_MEASUREMENT_ID
-ARG N8N_WEBHOOK_URL=/api/webhook/devops-agent
-ARG CUBEPATH_API_URL=https://api.cubepath.com/v1/vps/
+# Instalar gettext para envsubst
+RUN apk add --no-cache gettext
 
-# Generar environment.ts desde el template con los valores reales.
-# El proyecto no usa fileReplacements, importa environment.ts directamente.
-RUN apk add --no-cache gettext && \
+# --- Inyectar variables de entorno en environment.ts ---
+# Dokploy escribe un .env en el directorio del código antes de hacer docker build.
+# Leemos ese .env, exportamos las variables, y envsubst las inyecta en el template.
+# Defaults para variables opcionales que podrían no estar en .env
+RUN set -a && \
+    [ -f .env ] && . .env; \
+    export CUBEPATH_API_URL="${CUBEPATH_API_URL:-https://api.cubepath.com/v1/vps/}" && \
+    export N8N_WEBHOOK_URL="${N8N_WEBHOOK_URL:-/api/webhook/devops-agent}" && \
+    set +a && \
     envsubst < src/environments/environment.template.ts > src/environments/environment.ts && \
-    cp src/environments/environment.ts src/environments/environment.prod.ts
+    cp src/environments/environment.ts src/environments/environment.prod.ts && \
+    echo "=== Generated environment.ts ===" && cat src/environments/environment.ts
 
 # Build de produccion
 RUN npx ng build --configuration production
 
 # ============================================
-# Stage 2: Servir con Nginx
+# Stage 2: Servir con Nginx (imagen final limpia)
 # ============================================
 FROM nginx:alpine
 
-# Limpiar default nginx
 RUN rm -rf /usr/share/nginx/html/*
 
 COPY --from=build /app/dist/agent-ia/browser /usr/share/nginx/html

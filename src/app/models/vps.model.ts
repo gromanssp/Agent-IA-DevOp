@@ -14,5 +14,6 @@ export interface VpsInfo {
   ram: string;
   disk: string;
   bandwidth: string;
+  pricePerHour: number;
   project: string;
 }

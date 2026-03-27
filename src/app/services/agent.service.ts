@@ -9,7 +9,11 @@ import {
   VpsAction,
   isVpsApiItem,
   isVpsApiList,
+  isVpsMetricsApi,
+  isVpsPlansApi,
   mapVpsApiToInfo,
+  mapVpsMetricsApiToMetrics,
+  mapVpsPlansApiToPlans,
 } from '../models';
 
 @Injectable({ providedIn: 'root' })
@@ -56,11 +60,40 @@ export class AgentService {
       };
     }
 
-    // Un solo VPS crudo → get_vps
+    // Planes de VPS → vps_plans (puede llegar como [{locations: [...]}] o {locations: [...]})
+    if (isVpsPlansApi(data)) {
+      const plansRaw = Array.isArray(data) ? data[0] : data;
+      const plans = mapVpsPlansApiToPlans(plansRaw);
+      return {
+        action: VpsAction.VPS_PLANS,
+        vps_id: null,
+        vps_name: null,
+        confirm_required: false,
+        user_message: `Planes disponibles en ${plans.locations.length} ubicación(es).`,
+        plansData: plans,
+      };
+    }
+
+    // Metricas de VPS → metrics (puede llegar como [{...}] o {...})
+    if (isVpsMetricsApi(data)) {
+      const metricsRaw = Array.isArray(data) ? data[0] : data;
+      const vpsId = (metricsRaw as Record<string, unknown>)['vps_id'] as string ?? 'unknown';
+      const metrics = mapVpsMetricsApiToMetrics(metricsRaw, vpsId);
+      return {
+        action: VpsAction.METRICS,
+        vps_id: vpsId,
+        vps_name: null,
+        confirm_required: false,
+        user_message: `Metricas del VPS ${vpsId} (${metrics.timeRange}).`,
+        metricsData: metrics,
+      };
+    }
+
+    // Ver los planes VPS → vps_plans
     if (isVpsApiItem(data)) {
       const vps = mapVpsApiToInfo(data);
       return {
-        action: VpsAction.GET_VPS,
+        action: VpsAction.VPS_PLANS,
         vps_id: vps.id,
         vps_name: vps.name,
         confirm_required: false,
@@ -87,11 +120,13 @@ export class AgentService {
       }
     }
 
+    const action = (obj['action'] as string) || (obj['pending_action'] as string);
+
     return {
-      action: (obj['action'] as VpsAction) ?? VpsAction.UNKNOWN,
+      action: (action as VpsAction) ?? VpsAction.UNKNOWN,
       vps_id: (obj['vps_id'] as string) ?? null,
       vps_name: (obj['vps_name'] as string) ?? null,
-      confirm_required: Boolean(obj['confirm_required']),
+      confirm_required: obj['confirm_required'] === true || obj['confirm_required'] === 'true',
       user_message: (obj['user_message'] as string) || 'Respuesta recibida.',
     };
   }

@@ -1,6 +1,6 @@
-import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input, signal, ChangeDetectionStrategy } from '@angular/core';
 import { BadgeComponent } from '../../shared/components/badge/badge.component';
-import { VpsInfo, VpsStatus } from '../../models';
+import { BadgeVariant, VpsInfo, VpsStatus } from '../../models';
 
 @Component({
   selector: 'app-vps-list',
@@ -13,18 +13,24 @@ import { VpsInfo, VpsStatus } from '../../models';
 export class VpsListComponent {
   vpsList = input.required<VpsInfo[]>();
 
-  statusVariant(
-    status: VpsStatus,
-  ): 'success' | 'danger' | 'warning' | 'secondary' {
-    const map: Record<string, 'success' | 'danger' | 'warning' | 'secondary'> =
-      {
-        [VpsStatus.ACTIVE]: 'success',
-        [VpsStatus.RUNNING]: 'success',
-        [VpsStatus.STOPPED]: 'danger',
-        [VpsStatus.ERROR]: 'danger',
-        [VpsStatus.RESTARTING]: 'warning',
-        [VpsStatus.CREATING]: 'warning',
-      };
-    return map[status] ?? 'secondary';
+  statusVariant(status: VpsStatus): BadgeVariant {
+    const map: Record<string, BadgeVariant> = {
+      [VpsStatus.ACTIVE]: BadgeVariant.SUCCESS,
+      [VpsStatus.RUNNING]: BadgeVariant.SUCCESS,
+      [VpsStatus.STOPPED]: BadgeVariant.DANGER,
+      [VpsStatus.ERROR]: BadgeVariant.DANGER,
+      [VpsStatus.RESTARTING]: BadgeVariant.WARNING,
+      [VpsStatus.CREATING]: BadgeVariant.WARNING,
+    };
+    return map[status] ?? BadgeVariant.SECONDARY;
+  }
+
+  copiedId = signal<string | null>(null);
+
+  copyId(id: string): void {
+    navigator.clipboard.writeText(id).then(() => {
+      this.copiedId.set(id);
+      setTimeout(() => this.copiedId.set(null), 1500);
+    });
   }
 }

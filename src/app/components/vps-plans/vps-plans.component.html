@@ -1,0 +1,73 @@
+<div class="plans-container">
+
+  <!-- Location tabs -->
+  <div class="location-tabs">
+    @for (loc of plans().locations; track loc.name; let i = $index) {
+      <button
+        class="location-tab"
+        [class.active]="selectedLocationIndex() === i"
+        (click)="selectLocation(i)">
+        <span class="flag">{{ locationFlag(loc.name) }}</span>
+        <span class="loc-desc">{{ loc.description }}</span>
+      </button>
+    }
+  </div>
+
+  <!-- Cluster filter -->
+  <div class="cluster-tabs">
+    @for (cluster of selectedLocation().clusters; track cluster.name; let i = $index) {
+      <button
+        class="cluster-tab"
+        [class.active]="selectedClusterIndex() === i"
+        [class.dedicated]="cluster.type === 'dedicated'"
+        (click)="selectCluster(i)">
+        {{ cluster.name }}
+        @if (cluster.type === 'dedicated') {
+          <span class="dedicated-badge">Dedicado</span>
+        }
+      </button>
+    }
+  </div>
+
+  <!-- Plans grid -->
+  @if (selectedLocation().clusters[selectedClusterIndex()]; as cluster) {
+    <div class="plans-grid">
+      @for (plan of cluster.plans; track plan.name) {
+        <div class="plan-card" [class.unavailable]="!plan.available">
+          <div class="plan-header">
+            <span class="plan-name">{{ plan.name }}</span>
+            @if (!plan.available) {
+              <span class="soon-badge">Pronto</span>
+            }
+          </div>
+
+          <div class="plan-price">
+            <span class="price-hour">${{ plan.pricePerHour.toFixed(5) }}</span>
+            <span class="price-unit">/hora</span>
+          </div>
+          <div class="price-month">~${{ plan.pricePerMonth }}/mes</div>
+
+          <div class="plan-specs">
+            <div class="spec">
+              <span class="spec-icon">⚡</span>
+              <span class="spec-value">{{ plan.cpu }} vCPU</span>
+            </div>
+            <div class="spec">
+              <span class="spec-icon">🧠</span>
+              <span class="spec-value">{{ formatRam(plan.ram) }} RAM</span>
+            </div>
+            <div class="spec">
+              <span class="spec-icon">💾</span>
+              <span class="spec-value">{{ plan.storage }} GB SSD</span>
+            </div>
+            <div class="spec">
+              <span class="spec-icon">🌐</span>
+              <span class="spec-value">{{ plan.bandwidth }} TB BW</span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>

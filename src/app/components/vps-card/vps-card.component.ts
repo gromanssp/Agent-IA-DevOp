@@ -1,5 +1,5 @@
 import { Component, input, computed, ChangeDetectionStrategy } from '@angular/core';
-import { AgentResponse, VpsAction } from '../../models';
+import { AgentResponse, BadgeVariant, VpsAction } from '../../models';
 import { BadgeComponent } from '../../shared/components/badge/badge.component';
 
 @Component({
@@ -16,11 +16,11 @@ export class VpsCardComponent {
   actionLabel = computed(() => {
     const labels: Record<VpsAction, string> = {
       [VpsAction.LIST_VPS]: 'Listar VPS',
-      [VpsAction.GET_VPS]: 'Detalle VPS',
+      [VpsAction.VPS_PLANS]: 'Planes VPS',
       [VpsAction.REBOOT]: 'Reiniciar',
       [VpsAction.POWER_OFF]: 'Apagar',
       [VpsAction.POWER_ON]: 'Encender',
-      [VpsAction.CREATE]: 'Crear VPS',
+      [VpsAction.METRICS]: 'Metricas',
       [VpsAction.DELETE]: 'Eliminar',
       [VpsAction.STATUS]: 'Estado',
       [VpsAction.UNKNOWN]: 'Desconocido',
@@ -28,18 +28,18 @@ export class VpsCardComponent {
     return labels[this.action().action] ?? this.action().action;
   });
 
-  badgeVariant = computed<'primary' | 'success' | 'warning' | 'danger' | 'secondary'>(() => {
-    const map: Record<VpsAction, 'primary' | 'success' | 'warning' | 'danger' | 'secondary'> = {
-      [VpsAction.LIST_VPS]: 'primary',
-      [VpsAction.GET_VPS]: 'primary',
-      [VpsAction.REBOOT]: 'warning',
-      [VpsAction.POWER_OFF]: 'danger',
-      [VpsAction.POWER_ON]: 'success',
-      [VpsAction.CREATE]: 'success',
-      [VpsAction.DELETE]: 'danger',
-      [VpsAction.STATUS]: 'secondary',
-      [VpsAction.UNKNOWN]: 'secondary',
+  badgeVariant = computed<BadgeVariant>(() => {
+    const map: Record<VpsAction, BadgeVariant> = {
+      [VpsAction.LIST_VPS]: BadgeVariant.PRIMARY,
+      [VpsAction.VPS_PLANS]: BadgeVariant.PRIMARY,
+      [VpsAction.REBOOT]: BadgeVariant.WARNING,
+      [VpsAction.POWER_OFF]: BadgeVariant.DANGER,
+      [VpsAction.POWER_ON]: BadgeVariant.SUCCESS,
+      [VpsAction.METRICS]: BadgeVariant.PRIMARY,
+      [VpsAction.DELETE]: BadgeVariant.DANGER,
+      [VpsAction.STATUS]: BadgeVariant.SECONDARY,
+      [VpsAction.UNKNOWN]: BadgeVariant.SECONDARY,
     };
-    return map[this.action().action] ?? 'secondary';
+    return map[this.action().action] ?? BadgeVariant.SECONDARY;
   });
 }

@@ -1,10 +1,10 @@
 export enum VpsAction {
   LIST_VPS = 'list_vps',
-  GET_VPS = 'get_vps',
+  VPS_PLANS = 'vps_plans',
   REBOOT = 'reboot',
   POWER_OFF = 'power_off',
   POWER_ON = 'power_on',
-  CREATE = 'create',
+  METRICS = 'metrics',
   STATUS = 'status',
   DELETE = 'delete',
   UNKNOWN = 'unknown',
@@ -22,6 +22,15 @@ export enum VpsStatus {
 export enum IpType {
   IPV4 = 'IPv4',
   IPV6 = 'IPv6',
+}
+
+export enum BadgeVariant {
+  PRIMARY = 'primary',
+  SUCCESS = 'success',
+  WARNING = 'warning',
+  DANGER = 'danger',
+  SECONDARY = 'secondary',
+  OUTLINE = 'outline',
 }
 
 export enum ChatRole {

@@ -1,0 +1,44 @@
+<div class="metrics-container">
+  <div class="metrics-header">
+    <span class="metrics-title">Metricas VPS {{ metrics().vpsId }}</span>
+    <span class="metrics-range">{{ metrics().timeRange }}</span>
+  </div>
+
+  <div class="metrics-grid">
+    @if (metrics().cpu.length) {
+      <div class="metric-card">
+        <span class="metric-label">CPU</span>
+        <div class="chart-wrapper">
+          <canvas baseChart [type]="cpuChart().type" [data]="cpuChart().data" [options]="cpuChart().options"></canvas>
+        </div>
+      </div>
+    }
+
+    @if (metrics().memory.length) {
+      <div class="metric-card">
+        <span class="metric-label">Memoria</span>
+        <div class="chart-wrapper">
+          <canvas baseChart [type]="memoryChart().type" [data]="memoryChart().data" [options]="memoryChart().options"></canvas>
+        </div>
+      </div>
+    }
+
+    @if (metrics().diskRead.length || metrics().diskWrite.length) {
+      <div class="metric-card">
+        <span class="metric-label">Disco</span>
+        <div class="chart-wrapper">
+          <canvas baseChart [type]="diskChart().type" [data]="diskChart().data" [options]="diskChart().options"></canvas>
+        </div>
+      </div>
+    }
+
+    @if (metrics().networkIn.length || metrics().networkOut.length) {
+      <div class="metric-card">
+        <span class="metric-label">Red</span>
+        <div class="chart-wrapper">
+          <canvas baseChart [type]="networkChart().type" [data]="networkChart().data" [options]="networkChart().options"></canvas>
+        </div>
+      </div>
+    }
+  </div>
+</div>

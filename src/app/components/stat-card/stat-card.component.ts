@@ -1,4 +1,5 @@
 import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { BadgeVariant } from '../../models';
 
 @Component({
   selector: 'app-stat-card',
@@ -12,5 +13,5 @@ export class StatCardComponent {
   value = input<string | number>('0');
   icon = input('');
   trend = input(0);
-  accent = input<'primary' | 'secondary' | 'success' | 'warning'>('primary');
+  accent = input<BadgeVariant>(BadgeVariant.PRIMARY);
 }

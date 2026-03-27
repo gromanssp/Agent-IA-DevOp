@@ -18,7 +18,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.25rem;
 }
 
 .vps-name {
@@ -27,11 +27,49 @@
   color: var(--text-primary);
 }
 
+.vps-id {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-family: monospace;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--radius-sm);
+  transition: background 0.2s, color 0.2s;
+}
+
+.vps-id:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+}
+
+.vps-id.copied {
+  color: var(--success);
+}
+
+.copy-icon {
+  opacity: 0.4;
+  transition: opacity 0.2s;
+}
+
+.vps-id:hover .copy-icon {
+  opacity: 1;
+}
+
+.vps-id.copied .copy-icon {
+  opacity: 1;
+}
+
 .vps-details {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem 1rem;
-  margin-bottom: 0.3rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.35rem 0.75rem;
+  justify-items: center;
+  text-align: center;
+  margin-bottom: 0.5rem;
 }
 
 .vps-detail {
@@ -44,10 +82,32 @@
   margin-right: 0.25rem;
 }
 
-.vps-id {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  font-family: monospace;
+.vps-highlights {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.vps-highlight {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-round);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.vps-highlight.os {
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--accent-primary);
+}
+
+.vps-highlight.price {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--success);
 }
 
 @keyframes itemIn {

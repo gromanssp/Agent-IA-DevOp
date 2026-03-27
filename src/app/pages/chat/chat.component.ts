@@ -19,6 +19,8 @@ import {
 } from '../../models';
 import { VpsCardComponent } from '../../components/vps-card/vps-card.component';
 import { VpsListComponent } from '../../components/vps-list/vps-list.component';
+import { VpsMetricsComponent } from '../../components/vps-metrics/vps-metrics.component';
+import { VpsPlansComponent } from '../../components/vps-plans/vps-plans.component';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog.component';
 
 @Component({
@@ -26,7 +28,7 @@ import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-
   standalone: true,
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
-  imports: [FormsModule, DatePipe, VpsCardComponent, VpsListComponent, ConfirmDialogComponent],
+  imports: [FormsModule, DatePipe, VpsCardComponent, VpsListComponent, VpsMetricsComponent, VpsPlansComponent, ConfirmDialogComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChatComponent implements AfterViewChecked {
@@ -58,7 +60,7 @@ export class ChatComponent implements AfterViewChecked {
     '¿Cuántos VPS tengo activos?',
     'Reinicia el servidor de producción',
     '¿Cuánta RAM tiene el VPS staging?',
-    'Crea un VPS nano en Barcelona',
+    'Muestra las metricas del VPS 22897',
   ];
 
   showSuggestions = computed(() => this.messages().length <= 1);
@@ -186,6 +188,8 @@ export class ChatComponent implements AfterViewChecked {
       timestamp: new Date(),
       action: response,
       vpsData: response.vpsData,
+      metricsData: response.metricsData,
+      plansData: response.plansData,
     };
 
     if (response.confirm_required) {

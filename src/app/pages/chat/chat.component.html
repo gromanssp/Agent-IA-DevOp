@@ -27,7 +27,11 @@
             </div>
           } @else {
             <p class="message-text">{{ msg.content }}</p>
-            @if (msg.vpsData) {
+            @if (msg.metricsData) {
+              <app-vps-metrics [metrics]="msg.metricsData"></app-vps-metrics>
+            } @else if (msg.plansData) {
+              <app-vps-plans [plans]="msg.plansData"></app-vps-plans>
+            } @else if (msg.vpsData) {
               <app-vps-list [vpsList]="msg.vpsData"></app-vps-list>
             } @else if (msg.action && !msg.confirmPending && msg.action.action !== VpsAction.UNKNOWN) {
               <app-vps-card [action]="msg.action"></app-vps-card>

@@ -1,5 +1,7 @@
 import { ChatRole, VpsAction } from './enums';
 import { VpsInfo } from './vps.model';
+import { VpsMetrics } from './vps-metrics.model';
+import { VpsPlans } from './vps-plans.model';
 
 export interface ChatMessage {
   id: string;
@@ -9,6 +11,8 @@ export interface ChatMessage {
   loading?: boolean;
   action?: AgentResponse;
   vpsData?: VpsInfo[];
+  metricsData?: VpsMetrics;
+  plansData?: VpsPlans;
   confirmPending?: boolean;
 }
 
@@ -24,4 +28,6 @@ export interface AgentResponse {
   confirm_required: boolean;
   user_message: string;
   vpsData?: VpsInfo[];
+  metricsData?: VpsMetrics;
+  plansData?: VpsPlans;
 }

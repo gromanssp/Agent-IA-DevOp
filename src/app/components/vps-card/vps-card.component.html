@@ -1,11 +1,11 @@
 <div class="vps-action-card">
   <div class="action-row">
     <app-badge [variant]="badgeVariant()" size="sm">{{ actionLabel() }}</app-badge>
-    @if (action().vps_name) {
-      <span class="vps-name">{{ action().vps_name }}</span>
-    }
     @if (action().vps_id) {
       <span class="vps-id">ID: {{ action().vps_id }}</span>
+    }
+    @if (action().vps_name) {
+      <span class="vps-name">{{ action().vps_name }}</span>
     }
   </div>
 </div>

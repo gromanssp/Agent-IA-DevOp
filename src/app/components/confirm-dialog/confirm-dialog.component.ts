@@ -7,7 +7,6 @@ import { VpsAction } from '../../models';
   standalone: true,
   templateUrl: './confirm-dialog.component.html',
   styleUrl: './confirm-dialog.component.css',
-  imports: [LowerCasePipe],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ConfirmDialogComponent {
@@ -26,9 +25,9 @@ export class ConfirmDialogComponent {
       [VpsAction.POWER_OFF]: 'Apagar',
       [VpsAction.POWER_ON]: 'Encender',
       [VpsAction.DELETE]: 'Eliminar',
-      [VpsAction.CREATE]: 'Crear',
+      [VpsAction.METRICS]: 'Metricas',
       [VpsAction.LIST_VPS]: 'Listar',
-      [VpsAction.GET_VPS]: 'Consultar',
+      [VpsAction.VPS_PLANS]: 'Planes VPS',
       [VpsAction.STATUS]: 'Estado',
       [VpsAction.UNKNOWN]: 'Desconocido',
     };

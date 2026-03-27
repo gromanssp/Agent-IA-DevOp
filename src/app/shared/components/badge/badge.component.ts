@@ -1,4 +1,5 @@
 import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { BadgeVariant } from '../../../models';
 
 @Component({
   selector: 'app-badge',
@@ -8,6 +9,6 @@ import { Component, input, ChangeDetectionStrategy } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BadgeComponent {
-  variant = input<'primary' | 'success' | 'warning' | 'danger' | 'secondary' | 'outline'>('primary');
+  variant = input<BadgeVariant>(BadgeVariant.PRIMARY);
   size = input<'sm' | 'md' | 'lg'>('md');
 }

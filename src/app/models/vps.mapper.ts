@@ -18,6 +18,7 @@ export function mapVpsApiToInfo(raw: VpsApiItem): VpsInfo {
     ram: `${raw.plan?.ram ?? 0} MB`,
     disk: `${raw.plan?.storage ?? 0} GB`,
     bandwidth: `${raw.plan?.bandwidth ?? 0} TB`,
+    pricePerHour: raw.plan?.price_per_hour ?? 0,
     project: raw.project?.name ?? 'N/A',
   };
 }

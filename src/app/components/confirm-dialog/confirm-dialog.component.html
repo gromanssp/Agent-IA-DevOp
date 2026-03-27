@@ -19,9 +19,22 @@
     @if (message()) {
       <p class="confirm-message text-small">{{ message() }}</p>
     }
+    @if (requiresId()) {
+      <div class="confirm-id-input">
+        <label class="confirm-id-label text-small" for="vps-id-input">ID del VPS</label>
+        <input
+          id="vps-id-input"
+          type="text"
+          class="confirm-id-field"
+          [value]="enteredId()"
+          (input)="enteredId.set($any($event.target).value)"
+          placeholder="Ej: 22897"
+          autocomplete="off">
+      </div>
+    }
     <div class="confirm-actions">
       <button class="btn btn-cancel" (click)="cancel()">Cancelar</button>
-      <button class="btn" [class.btn-danger]="isDangerous()" [class.btn-gradient]="!isDangerous()" (click)="confirm()">
+      <button class="btn" [class.btn-danger]="isDangerous()" [class.btn-gradient]="!isDangerous()" [disabled]="!canConfirm()" (click)="confirm()">
         {{ actionLabel() }}
       </button>
     </div>

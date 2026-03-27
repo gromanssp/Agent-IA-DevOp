@@ -45,6 +45,34 @@
   margin-bottom: 1.25rem;
   color: var(--text-muted);
 }
+.confirm-id-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 1rem;
+  text-align: left;
+}
+.confirm-id-label {
+  color: var(--text-secondary);
+}
+.confirm-id-field {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: var(--text-primary);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.confirm-id-field:focus {
+  border-color: var(--accent-primary);
+}
+.confirm-id-field::placeholder {
+  color: var(--text-muted);
+}
 .confirm-actions {
   display: flex;
   gap: 0.75rem;

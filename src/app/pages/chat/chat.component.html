@@ -61,6 +61,7 @@
       [action]="pending.action.action"
       [vpsName]="pending.action.vps_name ?? pending.action.vps_id ?? 'desconocido'"
       [message]="pending.action.user_message"
+      [vpsId]="pending.action.vps_id"
       (confirmed)="onConfirm($event)">
     </app-confirm-dialog>
   }

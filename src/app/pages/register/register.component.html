@@ -1,0 +1,42 @@
+<div class="glass-panel auth-card">
+  <div class="auth-header">
+    <div class="logo-icon mx-auto mb-3"></div>
+    <h1 class="heading-2">Create Account</h1>
+    <p class="text-body text-center">Get started with Groman2 today</p>
+  </div>
+
+  @if (errorMessage) {
+    <div class="alert alert-error mb-3">
+      {{ errorMessage }}
+    </div>
+  }
+
+  <form class="auth-form" (ngSubmit)="register()">
+    <div class="form-group">
+      <label class="form-label">Full Name</label>
+      <input type="text" class="form-control" placeholder="Jane Doe"
+        [(ngModel)]="fullName" name="fullName" autocomplete="name">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Email Address</label>
+      <input type="email" class="form-control" placeholder="name@company.com"
+        [(ngModel)]="email" name="email" autocomplete="email">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input type="password" class="form-control" placeholder="••••••••"
+        [(ngModel)]="password" name="password" autocomplete="new-password">
+      <span class="text-small text-muted">Must be at least 6 characters</span>
+    </div>
+
+    <button type="submit" class="btn btn-gradient w-100 mb-3" [disabled]="loading">
+      {{ loading ? 'Creating account...' : 'Create Account' }}
+    </button>
+  </form>
+
+  <div class="auth-footer text-center mt-4">
+    <p class="text-small">Already have an account? <a routerLink="/auth/login" class="text-primary font-medium">Log in</a></p>
+  </div>
+</div>

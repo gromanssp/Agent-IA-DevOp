@@ -79,7 +79,7 @@ Usuario (Chat)
 │  └─ SI → VpsList        │  Cards con detalle completo
 │                         │
 │  confirm_required?      │
-│  └─ SI → ConfirmDialog  │  Acciones peligrosas
+│  └─ SI → ConfirmDialog  │  Acciones peligrosas o Metricas sin ID
 │                         │
 │  action?                │
 │  └─ SI → VpsCard        │  Badge de accion

@@ -115,11 +115,11 @@ export class ChatComponent implements AfterViewChecked {
     this.sendMessage(text);
   }
 
-  onConfirm(confirmed: boolean): void {
+  onConfirm(result: { confirmed: boolean; vpsId: string | null }): void {
     const pending = this.pendingConfirm();
     if (!pending) return;
 
-    if (confirmed) {
+    if (result.confirmed) {
       const loadingMessage: ChatMessage = {
         id: crypto.randomUUID(),
         role: ChatRole.ASSISTANT,
@@ -132,7 +132,7 @@ export class ChatComponent implements AfterViewChecked {
       this.shouldScroll = true;
 
       this.agentService
-        .confirmAction(pending.action.action, pending.action.vps_id)
+        .confirmAction(pending.action.action, result.vpsId)
         .subscribe({
           next: (response) => this.handleResponse(response, loadingMessage.id),
           error: (err) => this.handleError(loadingMessage.id, err),

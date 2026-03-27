@@ -1,5 +1,4 @@
-import { Component, input, output, computed, ChangeDetectionStrategy } from '@angular/core';
-import { LowerCasePipe } from '@angular/common';
+import { Component, input, output, computed, signal, ChangeDetectionStrategy } from '@angular/core';
 import { VpsAction } from '../../models';
 
 @Component({
@@ -13,7 +12,14 @@ export class ConfirmDialogComponent {
   action = input.required<VpsAction>();
   vpsName = input.required<string>();
   message = input('');
-  confirmed = output<boolean>();
+  vpsId = input<string | null>(null);
+
+  confirmed = output<{ confirmed: boolean; vpsId: string | null }>();
+
+  enteredId = signal('');
+
+  requiresId = computed(() => this.vpsId() === null);
+  canConfirm = computed(() => !this.requiresId() || !!this.enteredId().trim());
 
   isDangerous = computed(() =>
     [VpsAction.POWER_OFF, VpsAction.DELETE, VpsAction.REBOOT].includes(this.action())
@@ -29,11 +35,19 @@ export class ConfirmDialogComponent {
       [VpsAction.LIST_VPS]: 'Listar',
       [VpsAction.VPS_PLANS]: 'Planes VPS',
       [VpsAction.STATUS]: 'Estado',
-      [VpsAction.UNKNOWN]: 'Desconocido',
+      [VpsAction.UNKNOWN]: 'Desconocida',
     };
     return labels[this.action()] ?? this.action();
   });
 
-  confirm(): void { this.confirmed.emit(true); }
-  cancel(): void { this.confirmed.emit(false); }
+  confirm(): void {
+    this.confirmed.emit({
+      confirmed: true,
+      vpsId: this.requiresId() ? this.enteredId().trim() : this.vpsId(),
+    });
+  }
+
+  cancel(): void {
+    this.confirmed.emit({ confirmed: false, vpsId: null });
+  }
 }

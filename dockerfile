@@ -22,10 +22,13 @@ ARG FIREBASE_MESSAGING_SENDER_ID
 ARG FIREBASE_APP_ID
 ARG FIREBASE_MEASUREMENT_ID
 ARG N8N_WEBHOOK_URL=/api/webhook/devops-agent
+ARG CUBEPATH_API_URL=https://api.cubepath.com/v1/vps/
 
-# Reemplazar los placeholders ${...} del template con los valores reales
+# Generar environment.ts desde el template con los valores reales.
+# El proyecto no usa fileReplacements, importa environment.ts directamente.
 RUN apk add --no-cache gettext && \
-    envsubst < src/environments/environment.template.ts > src/environments/environment.prod.ts
+    envsubst < src/environments/environment.template.ts > src/environments/environment.ts && \
+    cp src/environments/environment.ts src/environments/environment.prod.ts
 
 # Build de produccion
 RUN npx ng build --configuration production

@@ -28,6 +28,11 @@ RUN set -a && \
     cp src/environments/environment.ts src/environments/environment.prod.ts && \
     echo "=== Generated environment.ts ===" && cat src/environments/environment.ts
 
+# Cache-bust: cambia BUILD_DATE en Dokploy para forzar rebuild limpio
+# Formato: YYYYMMDD-HHMM (ej: 20260327-1800)
+ARG BUILD_DATE=unknown
+RUN echo "Build: ${BUILD_DATE}" > /tmp/build-info.txt
+
 # Build de produccion
 RUN npx ng build --configuration production
 

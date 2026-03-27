@@ -2,6 +2,7 @@ node_modules
 .angular/
 .editorconfig
 dist/
+.claude/
 
 # Ignorar environments con secretos reales, pero subir el template
 src/environments/environment.ts

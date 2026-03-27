@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
@@ -17,26 +17,39 @@ export class RegisterComponent {
   email = '';
   password = '';
   errorMessage = '';
-  loading = false;
+  loading = signal(false);
 
-  async register() {
+  async register(): Promise<void> {
     if (!this.fullName || !this.email || !this.password) {
-      this.errorMessage = 'Please fill in all fields.';
+      this.errorMessage = 'Por favor, completa todos los campos.';
       return;
     }
     if (this.password.length < 6) {
-      this.errorMessage = 'Password must be at least 6 characters.';
+      this.errorMessage = 'La contrasena debe tener al menos 6 caracteres.';
       return;
     }
-    this.loading = true;
+    this.loading.set(true);
     this.errorMessage = '';
     try {
       await this.authService.register(this.email, this.password, this.fullName);
       this.router.navigate(['/']);
     } catch {
-      this.errorMessage = 'An error occurred. Please try again.';
+      this.errorMessage = 'Error al crear la cuenta. Intenta de nuevo.';
     } finally {
-      this.loading = false;
+      this.loading.set(false);
+    }
+  }
+
+  async loginWithGoogle(): Promise<void> {
+    this.loading.set(true);
+    this.errorMessage = '';
+    try {
+      await this.authService.loginWithGoogle();
+      this.router.navigate(['/']);
+    } catch {
+      this.errorMessage = 'Error al iniciar sesion con Google.';
+    } finally {
+      this.loading.set(false);
     }
   }
 }

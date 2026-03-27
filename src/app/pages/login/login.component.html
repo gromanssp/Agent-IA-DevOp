@@ -1,8 +1,8 @@
 <div class="glass-panel auth-card">
   <div class="auth-header">
     <div class="logo-icon mx-auto mb-3"></div>
-    <h1 class="heading-2">Welcome Back</h1>
-    <p class="text-body text-center">Sign in to your Groman2 account</p>
+    <h1 class="heading-2">Bienvenido</h1>
+    <p class="text-body text-center">Inicia sesion en tu cuenta</p>
   </div>
 
   @if (errorMessage) {
@@ -11,33 +11,72 @@
     </div>
   }
 
-  <form class="auth-form" (ngSubmit)="login()">
-    <div class="form-group">
-      <label class="form-label">Email Address</label>
-      <input type="email" class="form-control" placeholder="name@company.com"
-        [(ngModel)]="email" name="email" autocomplete="email">
-    </div>
+  <!-- Google Sign-In -->
+  <button type="button"
+    class="btn btn-google w-100 d-flex justify-center gap-2 mb-3"
+    (click)="loginWithGoogle()"
+    [disabled]="loading()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/>
+    </svg>
+    {{ loading() ? 'Conectando...' : 'Continuar con Google' }}
+  </button>
 
-    <div class="form-group">
-      <div class="d-flex justify-between">
-        <label class="form-label">Password</label>
-        <a href="#" class="text-small text-primary">Forgot Password?</a>
+  <!-- Divider -->
+  <div class="divider mb-3">
+    <span class="text-small text-muted">o usa tus credenciales</span>
+  </div>
+
+  <!-- Tabs -->
+  <div class="auth-tabs mb-3">
+    <button class="tab-btn" [class.active]="activeTab() === 'email'" (click)="setTab('email')">
+      Email
+    </button>
+    <button class="tab-btn" [class.active]="activeTab() === 'cubepath'" (click)="setTab('cubepath')">
+      Cubepath Token
+    </button>
+  </div>
+
+  <!-- Email/Password Tab -->
+  @if (activeTab() === 'email') {
+    <form class="auth-form" (ngSubmit)="login()">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-control" placeholder="nombre@empresa.com"
+          [(ngModel)]="email" name="email" autocomplete="email">
       </div>
-      <input type="password" class="form-control" placeholder="••••••••"
-        [(ngModel)]="password" name="password" autocomplete="current-password">
-    </div>
 
-    <button type="submit" class="btn btn-gradient w-100 mb-3" [disabled]="loading">
-      {{ loading ? 'Signing in...' : 'Sign In' }}
-    </button>
-    <button type="button" class="btn btn-outline-secondary w-100 text-center d-flex justify-center gap-2"
-      (click)="loginWithGoogle()" [disabled]="loading">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>
-      Sign in with Google
-    </button>
-  </form>
+      <div class="form-group">
+        <label class="form-label">Contrasena</label>
+        <input type="password" class="form-control" placeholder="********"
+          [(ngModel)]="password" name="password" autocomplete="current-password">
+      </div>
+
+      <button type="submit" class="btn btn-gradient w-100" [disabled]="loading()">
+        {{ loading() ? 'Iniciando sesion...' : 'Iniciar Sesion' }}
+      </button>
+    </form>
+  }
+
+  <!-- Cubepath Token Tab -->
+  @if (activeTab() === 'cubepath') {
+    <form class="auth-form" (ngSubmit)="loginWithCubepath()">
+      <div class="form-group">
+        <label class="form-label">API Token de Cubepath</label>
+        <input type="password" class="form-control" placeholder="Pega tu API token aqui"
+          [(ngModel)]="cubepathToken" name="cubepathToken" autocomplete="off">
+        <span class="text-small text-muted">
+          Generalo en <a href="https://my.cubepath.com" target="_blank" rel="noopener" class="text-primary">my.cubepath.com</a> &rarr; API Settings
+        </span>
+      </div>
+
+      <button type="submit" class="btn btn-cubepath w-100" [disabled]="loading() || !cubepathToken.trim()">
+        {{ loading() ? 'Verificando token...' : 'Conectar con Cubepath' }}
+      </button>
+    </form>
+  }
 
   <div class="auth-footer text-center mt-4">
-    <p class="text-small">Don't have an account? <a routerLink="/auth/register" class="text-primary font-medium">Create one now</a></p>
+    <p class="text-small">No tienes cuenta? <a routerLink="/auth/register" class="text-primary font-medium">Crear una ahora</a></p>
   </div>
 </div>

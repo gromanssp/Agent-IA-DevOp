@@ -14,5 +14,13 @@
     "pathRewrite": {
       "^/api/webhook-test/": "/webhook-test/"
     }
+  },
+  "/api/cubepath/": {
+    "target": "https://api.cubepath.com",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api/cubepath/": "/"
+    }
   }
 }

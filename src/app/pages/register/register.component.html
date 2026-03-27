@@ -1,8 +1,8 @@
 <div class="glass-panel auth-card">
   <div class="auth-header">
     <div class="logo-icon mx-auto mb-3"></div>
-    <h1 class="heading-2">Create Account</h1>
-    <p class="text-body text-center">Get started with Groman2 today</p>
+    <h1 class="heading-2">Crear Cuenta</h1>
+    <p class="text-body text-center">Registrate para empezar</p>
   </div>
 
   @if (errorMessage) {
@@ -11,32 +11,48 @@
     </div>
   }
 
+  <!-- Google Sign-Up -->
+  <button type="button"
+    class="btn btn-google w-100 d-flex justify-center gap-2 mb-3"
+    (click)="loginWithGoogle()"
+    [disabled]="loading()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/>
+    </svg>
+    {{ loading() ? 'Conectando...' : 'Registrarse con Google' }}
+  </button>
+
+  <!-- Divider -->
+  <div class="divider mb-3">
+    <span class="text-small text-muted">o con email</span>
+  </div>
+
   <form class="auth-form" (ngSubmit)="register()">
     <div class="form-group">
-      <label class="form-label">Full Name</label>
-      <input type="text" class="form-control" placeholder="Jane Doe"
+      <label class="form-label">Nombre Completo</label>
+      <input type="text" class="form-control" placeholder="Jorge Gonzalez"
         [(ngModel)]="fullName" name="fullName" autocomplete="name">
     </div>
 
     <div class="form-group">
-      <label class="form-label">Email Address</label>
-      <input type="email" class="form-control" placeholder="name@company.com"
+      <label class="form-label">Email</label>
+      <input type="email" class="form-control" placeholder="nombre@empresa.com"
         [(ngModel)]="email" name="email" autocomplete="email">
     </div>
 
     <div class="form-group">
-      <label class="form-label">Password</label>
-      <input type="password" class="form-control" placeholder="••••••••"
+      <label class="form-label">Contrasena</label>
+      <input type="password" class="form-control" placeholder="********"
         [(ngModel)]="password" name="password" autocomplete="new-password">
-      <span class="text-small text-muted">Must be at least 6 characters</span>
+      <span class="text-small text-muted">Minimo 6 caracteres</span>
     </div>
 
-    <button type="submit" class="btn btn-gradient w-100 mb-3" [disabled]="loading">
-      {{ loading ? 'Creating account...' : 'Create Account' }}
+    <button type="submit" class="btn btn-gradient w-100 mb-3" [disabled]="loading()">
+      {{ loading() ? 'Creando cuenta...' : 'Crear Cuenta' }}
     </button>
   </form>
 
   <div class="auth-footer text-center mt-4">
-    <p class="text-small">Already have an account? <a routerLink="/auth/login" class="text-primary font-medium">Log in</a></p>
+    <p class="text-small">Ya tienes cuenta? <a routerLink="/auth/login" class="text-primary font-medium">Inicia sesion</a></p>
   </div>
 </div>

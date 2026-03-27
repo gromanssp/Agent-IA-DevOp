@@ -3,4 +3,8 @@ node_modules
 .editorconfig
 dist/
 
-src/environments/
+# Ignorar environments con secretos reales, pero subir el template
+src/environments/environment.ts
+src/environments/environment.prod.ts
+# El template solo tiene ${PLACEHOLDERS}, es seguro subirlo
+# src/environments/environment.template.ts  ← SE SUBE AL REPO

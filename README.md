@@ -55,7 +55,6 @@ La aplicacion soporta tres metodos de autenticacion:
 |--------|-------------|
 | **Google** | Sign-in con cuenta de Google via Firebase Auth (popup) |
 | **Email/Password** | Registro e inicio de sesion con email y contrasena via Firebase Auth |
-| **CubePath Token** | Autenticacion directa con API token de CubePath |
 
 - Las sesiones de Google y Email se gestionan via Firebase `onAuthStateChanged`
 - La sesion de CubePath se almacena en `sessionStorage` (se borra al cerrar pestana)
@@ -102,8 +101,8 @@ Usuario (Chat)
 │  metricsData?           │
 │  └─ SI → VpsMetrics     │  Charts CPU, RAM, Disco, Red
 │                         │
-│  plansData?             │
-│  └─ SI → VpsPlans       │  Grid de planes por ubicacion y cluster
+│  plansData              │
+│  └─→ VpsPlans           │  Grid de planes por ubicacion y cluster
 │                         │
 │  vpsData?               │
 │  └─ SI → VpsList        │  Cards con detalle completo
@@ -141,7 +140,6 @@ src/app/
 │   ├── webhook-mode.service.ts     # Toggle TEST/PROD — URL dinamica con signal + localStorage
 │   ├── response-normalizer.service.ts # Normaliza respuestas crudas de n8n
 │   ├── chat-suggestions.service.ts # Comunicacion sidebar → chat (operaciones rapidas)
-│   ├── theme.service.ts            # Sistema de 12 temas de color
 │   └── sidebar.service.ts          # Estado del sidebar
 ├── guards/
 │   ├── auth.guard.ts               # Protege rutas autenticadas
@@ -159,7 +157,7 @@ src/app/
 │   └── dashboard/                  # Layout principal (sidebar + navbar + content)
 ├── components/
 │   ├── sidebar/                    # Navegacion colapsable + botones de operaciones
-│   ├── navbar/                     # Header con toggle TEST/PROD, avatar, tema y logout
+│   ├── navbar/                     # Header con toggle TEST/PROD, avatar, logout
 │   ├── vps-card/                   # Card de accion individual
 │   ├── vps-list/                   # Lista de VPS con detalle completo
 │   ├── vps-metrics/                # Graficas de metricas (CPU, RAM, Disco, Red)
@@ -184,8 +182,6 @@ El sidebar incluye botones de acceso rapido para todas las operaciones. Al hacer
 | Reiniciar | `reboot` | Reinicio del servidor (requiere confirmacion) |
 | Apagar | `power_off` | Apagado del servidor (requiere confirmacion) |
 | Encender | `power_on` | Encendido del servidor |
-| Eliminar | `delete` | Eliminacion del servidor (requiere confirmacion) |
-| Estado | `status` | Estado actual del servidor |
 
 ---
 

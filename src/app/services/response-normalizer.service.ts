@@ -7,7 +7,6 @@ export class ResponseNormalizerService {
   private handlers = inject(ACTION_HANDLERS);
 
   normalize(raw: unknown): AgentResponse {
-    console.log('Raw n8n response:', raw);
     const data = this.resolveData(this.unwrap(raw));
     const handler = this.handlers.find((h) => h.canHandle(data));
     return handler!.handle(data);

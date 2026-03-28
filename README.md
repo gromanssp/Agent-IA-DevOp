@@ -4,6 +4,7 @@
 
 ![Angular](https://img.shields.io/badge/Angular-21-DD0031?logo=angular)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript)
+![Firebase](https://img.shields.io/badge/Firebase-Auth-FFCA28?logo=firebase)
 ![n8n](https://img.shields.io/badge/n8n-Webhook-EA4B71?logo=n8n)
 ![Chart.js](https://img.shields.io/badge/Chart.js-4.3-FF6384?logo=chartdotjs)
 ![License](https://img.shields.io/badge/License-MIT-green)
@@ -33,11 +34,28 @@ npm run build
 | Framework | Angular | 21.2.4 |
 | Lenguaje | TypeScript | 5.9 |
 | Reactivo | RxJS | 7.8.0 |
+| Autenticacion | Firebase Auth (Google + Email) | 1.x |
 | Charts | Chart.js + ng2-charts | 4.3 / 10.0 |
 | UI | CSS Custom Properties + Glassmorphism | — |
 | Backend | n8n Webhook (AI Agent) | — |
 | API | CubePath VPS API | v1 |
 | Testing | Karma + Jasmine | 6.4 / 5.2 |
+
+---
+
+## Autenticacion
+
+La aplicacion soporta tres metodos de autenticacion:
+
+| Metodo | Descripcion |
+|--------|-------------|
+| **Google** | Sign-in con cuenta de Google via Firebase Auth (popup) |
+| **Email/Password** | Registro e inicio de sesion con email y contrasena via Firebase Auth |
+| **CubePath Token** | Autenticacion directa con API token de CubePath |
+
+- Las sesiones de Google y Email se gestionan via Firebase `onAuthStateChanged`
+- La sesion de CubePath se almacena en `sessionStorage` (se borra al cerrar pestana)
+- Rutas protegidas con `authGuard` (redirige a login) y `guestGuard` (redirige a chat)
 
 ---
 
@@ -107,16 +125,27 @@ src/app/
 │   └── chat.model.ts               # ChatMessage, AgentRequest, AgentResponse
 ├── services/
 │   ├── agent.service.ts            # Comunicacion con n8n + normalizacion
+│   ├── auth.service.ts             # Firebase Auth (Google, Email, CubePath token)
+│   ├── chat-suggestions.service.ts # Comunicacion sidebar → chat (operaciones rapidas)
 │   ├── theme.service.ts            # Sistema de 12 temas de color
 │   └── sidebar.service.ts          # Estado del sidebar
+├── guards/
+│   ├── auth.guard.ts               # Protege rutas autenticadas
+│   └── guest.guard.ts              # Redirige usuarios logueados
+├── interceptors/
+│   └── auth.interceptor.ts         # Inyecta token CubePath en requests
 ├── pages/
 │   ├── chat/                       # Interfaz principal de chat
+│   ├── login/                      # Login (Google, Email, CubePath)
+│   ├── register/                   # Registro con email
+│   ├── settings/                   # Configuracion
 │   └── not-found/                  # Pagina 404
 ├── layouts/
-│   └── dashboard.component         # Layout principal (sidebar + navbar + content)
+│   ├── auth/                       # Layout para login/register
+│   └── dashboard/                  # Layout principal (sidebar + navbar + content)
 ├── components/
-│   ├── sidebar/                    # Navegacion colapsable
-│   ├── navbar/                     # Header con cambio de tema
+│   ├── sidebar/                    # Navegacion colapsable + botones de operaciones
+│   ├── navbar/                     # Header con avatar, tema y logout
 │   ├── vps-card/                   # Card de accion individual
 │   ├── vps-list/                   # Lista de VPS con detalle completo
 │   ├── vps-metrics/                # Graficas de metricas (CPU, RAM, Disco, Red)
@@ -130,6 +159,8 @@ src/app/
 ---
 
 ## Acciones soportadas
+
+El sidebar incluye botones de acceso rapido para todas las operaciones. Al hacer click, se envia automaticamente el comando al chat:
 
 | Accion | Enum | Descripcion |
 |--------|------|-------------|
@@ -147,6 +178,8 @@ src/app/
 ## Funcionalidades
 
 - **Chat en lenguaje natural** — Gestiona servidores VPS conversando en espanol
+- **Autenticacion multi-metodo** — Google Sign-In, Email/Password y CubePath API Token via Firebase Auth
+- **Sidebar con operaciones rapidas** — Botones de acceso directo a todas las acciones VPS disponibles
 - **Planes de VPS** — Visualizacion interactiva de planes por ubicacion (Barcelona, Houston, Miami) y tipo de cluster (General Purpose, High Frequency, Dedicated CPU) con precio/hora y precio/mes calculado
 - **Metricas en tiempo real** — Graficas de CPU, memoria, disco y red con Chart.js en grid 2x2
 - **Deteccion automatica de datos** — Reconoce respuestas de CubePath (planes, VPS list, VPS single, metricas) y las mapea a modelos de dominio
@@ -185,8 +218,12 @@ Query params de metricas: `metrics` (comma-separated), `time_range` (1h, 7d, etc
 | Variable | Descripcion | Default |
 |----------|-------------|---------|
 | `n8nWebhookUrl` | URL del webhook de n8n | `/api/webhook-test/devops-agent` |
+| `cubepathApiUrl` | URL de la API CubePath (proxied en dev) | `/api/cubepath/v1/vps/` |
+| `firebase` | Configuracion de Firebase (apiKey, authDomain, etc.) | Ver `environment.ts` |
 
 Configuracion en `src/environments/environment.ts` y `environment.prod.ts`.
+
+El proxy de desarrollo (`proxy.conf.json`) redirige `/api/cubepath/` a `https://api.cubepath.com` para evitar CORS.
 
 ---
 

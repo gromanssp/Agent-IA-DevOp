@@ -1,5 +1,6 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { SidebarService } from '../../services/sidebar.service';
+import { ChatSuggestionsService, SIDEBAR_SUGGESTIONS } from '../../services/chat-suggestions.service';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
@@ -12,9 +13,16 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 })
 export class SidebarComponent {
   private sidebarService = inject(SidebarService);
+  private chatSuggestions = inject(ChatSuggestionsService);
+
   collapsed = this.sidebarService.collapsed;
+  suggestions = SIDEBAR_SUGGESTIONS;
 
   toggle(): void {
     this.sidebarService.toggle();
+  }
+
+  useSuggestion(text: string): void {
+    this.chatSuggestions.send(text);
   }
 }

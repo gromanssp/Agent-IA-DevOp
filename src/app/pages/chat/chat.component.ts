@@ -6,11 +6,15 @@ import {
   viewChild,
   ElementRef,
   AfterViewChecked,
+  OnInit,
+  OnDestroy,
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
+import { Subscription } from 'rxjs';
 import { AgentService } from '../../services/agent.service';
+import { ChatSuggestionsService } from '../../services/chat-suggestions.service';
 import {
   AgentResponse,
   ChatMessage,
@@ -31,11 +35,14 @@ import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-
   imports: [FormsModule, DatePipe, VpsCardComponent, VpsListComponent, VpsMetricsComponent, VpsPlansComponent, ConfirmDialogComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ChatComponent implements AfterViewChecked {
+export class ChatComponent implements AfterViewChecked, OnInit, OnDestroy {
   private messagesContainer = viewChild<ElementRef>('messagesContainer');
   private messageInput = viewChild<ElementRef>('messageInput');
 
   private agentService = inject(AgentService);
+  private chatSuggestions = inject(ChatSuggestionsService);
+  private suggestionSub?: Subscription;
+
   readonly VpsAction = VpsAction;
   readonly ChatRole = ChatRole;
 
@@ -64,6 +71,16 @@ export class ChatComponent implements AfterViewChecked {
   ];
 
   showSuggestions = computed(() => this.messages().length <= 1);
+
+  ngOnInit(): void {
+    this.suggestionSub = this.chatSuggestions.suggestion$.subscribe((text) => {
+      this.sendMessage(text);
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.suggestionSub?.unsubscribe();
+  }
 
   ngAfterViewChecked(): void {
     if (this.shouldScroll) {

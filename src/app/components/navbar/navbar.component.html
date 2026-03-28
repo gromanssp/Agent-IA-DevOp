@@ -9,6 +9,15 @@
   </div>
   <div class="navbar-actions">
     <span class="navbar-badge">Hackathon CubePath 2026</span>
+    <button
+      class="webhook-toggle"
+      [class.test-mode]="webhookMode.isTestMode()"
+      (click)="webhookMode.toggle()"
+      [title]="webhookMode.isTestMode() ? 'Modo TEST — click para cambiar a PROD' : 'Modo PROD — click para cambiar a TEST'"
+    >
+      <span class="toggle-dot"></span>
+      {{ webhookMode.isTestMode() ? 'TEST' : 'PROD' }}
+    </button>
     @if (user(); as u) {
       <div class="user-info">
         @if (u.photoURL) {

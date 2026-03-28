@@ -1,14 +1,14 @@
-import { Directive, Input, ElementRef, OnChanges } from '@angular/core';
+import { Directive, Input, ElementRef, OnChanges, signal, input, inject } from '@angular/core';
 
 @Directive({ selector: '[appCollapse]' })
 export class CollapseDirective implements OnChanges {
-  @Input('appCollapse') isCollapsed = false;
-
-  constructor(private el: ElementRef) {}
+  appCollapse = input(false);
+  el = inject(ElementRef);
+  // @Input('appCollapse') isCollapsed = false;
 
   ngOnChanges(): void {
     const element = this.el.nativeElement;
-    if (this.isCollapsed) {
+    if (this.appCollapse()) {
       element.style.maxHeight = '0';
       element.style.overflow = 'hidden';
     } else {

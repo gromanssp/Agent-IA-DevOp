@@ -33,21 +33,21 @@ export const SIDEBAR_SUGGESTIONS: SuggestionItem[] = [
     text: 'Apaga el servidor de staging',
     svgPath: 'M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10',
   },
-  {
-    label: 'Estado',
-    text: '¿Cuál es el estado de mi VPS?',
-    svgPath: 'M22 12h-4l-3 9L9 3l-3 9H2',
-  },
+  // {
+  //   label: 'Estado',
+  //   text: '¿Cuál es el estado de mi VPS?',
+  //   svgPath: 'M22 12h-4l-3 9L9 3l-3 9H2',
+  // },
   {
     label: 'Ver planes',
     text: 'Muestra los planes de VPS disponibles',
     svgPath: 'M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5',
   },
-  {
-    label: 'Eliminar VPS',
-    text: 'Elimina el VPS de pruebas',
-    svgPath: 'M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2',
-  },
+  // {
+  //   label: 'Eliminar VPS',
+  //   text: 'Elimina el VPS de pruebas',
+  //   svgPath: 'M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2',
+  // },
 ];
 
 @Injectable({ providedIn: 'root' })

@@ -22,7 +22,7 @@ export class ConfirmDialogComponent {
   canConfirm = computed(() => !this.requiresId() || !!this.enteredId().trim());
 
   isDangerous = computed(() =>
-    [VpsAction.POWER_OFF, VpsAction.DELETE, VpsAction.REBOOT].includes(this.action())
+    [VpsAction.POWER_OFF, VpsAction.REBOOT].includes(this.action())
   );
 
   actionLabel = computed(() => {
@@ -30,11 +30,9 @@ export class ConfirmDialogComponent {
       [VpsAction.REBOOT]: 'Reiniciar',
       [VpsAction.POWER_OFF]: 'Apagar',
       [VpsAction.POWER_ON]: 'Encender',
-      [VpsAction.DELETE]: 'Eliminar',
       [VpsAction.METRICS]: 'Metricas',
       [VpsAction.LIST_VPS]: 'Listar',
       [VpsAction.VPS_PLANS]: 'Planes VPS',
-      [VpsAction.STATUS]: 'Estado',
       [VpsAction.UNKNOWN]: 'Desconocida',
     };
     return labels[this.action()] ?? this.action();

@@ -1,6 +1,6 @@
 <div class="glass-panel auth-card">
   <div class="auth-header">
-    <div class="logo-icon mx-auto mb-3"></div>
+     <img [ngSrc]="logoUrl" width="48" height="48" alt="AIA Logo" class="img mx-auto mb-3" priority>
     <h1 class="heading-2">Bienvenido</h1>
     <p class="text-body text-center">Inicia sesion en tu cuenta</p>
   </div>
@@ -28,14 +28,14 @@
   </div>
 
   <!-- Tabs -->
-  <div class="auth-tabs mb-3">
+  <!-- <div class="auth-tabs mb-3">
     <button class="tab-btn" [class.active]="activeTab() === 'email'" (click)="setTab('email')">
       Email
     </button>
     <button class="tab-btn" [class.active]="activeTab() === 'cubepath'" (click)="setTab('cubepath')">
       Cubepath Token
     </button>
-  </div>
+  </div> -->
 
   <!-- Email/Password Tab -->
   @if (activeTab() === 'email') {

@@ -5,8 +5,8 @@ export enum VpsAction {
   POWER_OFF = 'power_off',
   POWER_ON = 'power_on',
   METRICS = 'metrics',
-  STATUS = 'status',
-  DELETE = 'delete',
+  // STATUS = 'status',
+  // DELETE = 'delete',
   UNKNOWN = 'unknown',
 }
 

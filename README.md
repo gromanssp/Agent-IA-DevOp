@@ -7,6 +7,7 @@
 ![Firebase](https://img.shields.io/badge/Firebase-Auth-FFCA28?logo=firebase)
 ![n8n](https://img.shields.io/badge/n8n-Webhook-EA4B71?logo=n8n)
 ![Chart.js](https://img.shields.io/badge/Chart.js-4.3-FF6384?logo=chartdotjs)
+![Docker](https://img.shields.io/badge/Docker-Swarm-2496ED?logo=docker)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ---
@@ -39,6 +40,9 @@ npm run build
 | UI | CSS Custom Properties + Glassmorphism | — |
 | Backend | n8n Webhook (AI Agent) | — |
 | API | CubePath VPS API | v1 |
+| Servidor | Nginx Alpine | — |
+| Contenedor | Docker multi-stage build | — |
+| Orquestacion | Docker Swarm (via Dokploy) | — |
 | Testing | Karma + Jasmine | 6.4 / 5.2 |
 
 ---
@@ -76,7 +80,15 @@ Usuario (Chat)
 │  normalizeResponse()    │  planes, VPS list, VPS single, metricas,
 │                         │  wrappers {json:}, output strings
 └────────┬────────────────┘
-         │ HTTP POST
+         │ HTTP POST → WebhookModeService.webhookUrl()
+         ▼
+┌─────────────────────────────────────────┐
+│  Nginx proxy (en contenedor)            │
+│                                         │
+│  /api/webhook/       → n8n produccion   │
+│  /api/webhook-test/  → n8n test URL     │
+└────────┬────────────────────────────────┘
+         │
          ▼
 ┌─────────────────────────┐
 │  n8n Webhook            │  AI Agent procesa el mensaje,
@@ -126,6 +138,8 @@ src/app/
 ├── services/
 │   ├── agent.service.ts            # Comunicacion con n8n + normalizacion
 │   ├── auth.service.ts             # Firebase Auth (Google, Email, CubePath token)
+│   ├── webhook-mode.service.ts     # Toggle TEST/PROD — URL dinamica con signal + localStorage
+│   ├── response-normalizer.service.ts # Normaliza respuestas crudas de n8n
 │   ├── chat-suggestions.service.ts # Comunicacion sidebar → chat (operaciones rapidas)
 │   ├── theme.service.ts            # Sistema de 12 temas de color
 │   └── sidebar.service.ts          # Estado del sidebar
@@ -145,7 +159,7 @@ src/app/
 │   └── dashboard/                  # Layout principal (sidebar + navbar + content)
 ├── components/
 │   ├── sidebar/                    # Navegacion colapsable + botones de operaciones
-│   ├── navbar/                     # Header con avatar, tema y logout
+│   ├── navbar/                     # Header con toggle TEST/PROD, avatar, tema y logout
 │   ├── vps-card/                   # Card de accion individual
 │   ├── vps-list/                   # Lista de VPS con detalle completo
 │   ├── vps-metrics/                # Graficas de metricas (CPU, RAM, Disco, Red)
@@ -179,6 +193,7 @@ El sidebar incluye botones de acceso rapido para todas las operaciones. Al hacer
 
 - **Chat en lenguaje natural** — Gestiona servidores VPS conversando en espanol
 - **Autenticacion multi-metodo** — Google Sign-In, Email/Password y CubePath API Token via Firebase Auth
+- **Toggle TEST/PROD** — Boton en la navbar para cambiar entre el webhook de test y produccion de n8n en tiempo real, sin recargar (persiste en `localStorage`)
 - **Sidebar con operaciones rapidas** — Botones de acceso directo a todas las acciones VPS disponibles
 - **Planes de VPS** — Visualizacion interactiva de planes por ubicacion (Barcelona, Houston, Miami) y tipo de cluster (General Purpose, High Frequency, Dedicated CPU) con precio/hora y precio/mes calculado
 - **Metricas en tiempo real** — Graficas de CPU, memoria, disco y red con Chart.js en grid 2x2
@@ -192,6 +207,22 @@ El sidebar incluye botones de acceso rapido para todas las operaciones. Al hacer
 - **Angular Signals** — Estado reactivo sin Zone.js overhead
 - **Standalone Components** — Arquitectura sin NgModules
 - **OnPush Change Detection** — Rendimiento optimizado en todos los componentes
+
+---
+
+## Toggle TEST / PROD
+
+La navbar incluye un boton que permite cambiar el destino del webhook de n8n en tiempo real:
+
+| Estado | Color | Endpoint |
+|--------|-------|----------|
+| **PROD** | Verde | `/api/webhook/devops-agent` |
+| **TEST** | Amarillo | `/api/webhook-test/devops-agent` |
+
+- El estado se persiste en `localStorage` (clave `webhook_test_mode`)
+- `WebhookModeService` expone un `computed()` signal — el `AgentService` lo lee en cada request
+- El cambio es instantaneo, sin recargar la pagina
+- Util para probar flujos en n8n con la URL de test antes de activar produccion
 
 ---
 
@@ -215,15 +246,189 @@ Query params de metricas: `metrics` (comma-separated), `time_range` (1h, 7d, etc
 
 ## Variables de entorno
 
-| Variable | Descripcion | Default |
-|----------|-------------|---------|
-| `n8nWebhookUrl` | URL del webhook de n8n | `/api/webhook-test/devops-agent` |
-| `cubepathApiUrl` | URL de la API CubePath (proxied en dev) | `/api/cubepath/v1/vps/` |
-| `firebase` | Configuracion de Firebase (apiKey, authDomain, etc.) | Ver `environment.ts` |
+| Variable | Descripcion | Default produccion |
+|----------|-------------|-------------------|
+| `N8N_WEBHOOK_URL` | URL del webhook de n8n | `/api/webhook/devops-agent` |
+| `CUBEPATH_API_URL` | URL de la API CubePath | `https://api.cubepath.com/v1/vps/` |
+| `FIREBASE_API_KEY` | API Key de Firebase | — |
+| `FIREBASE_AUTH_DOMAIN` | Auth domain de Firebase | — |
+| `FIREBASE_PROJECT_ID` | Project ID de Firebase | — |
+| `FIREBASE_STORAGE_BUCKET` | Storage bucket de Firebase | — |
+| `FIREBASE_MESSAGING_SENDER_ID` | Sender ID de Firebase | — |
+| `FIREBASE_APP_ID` | App ID de Firebase | — |
+| `FIREBASE_MEASUREMENT_ID` | Measurement ID de Firebase | — |
 
-Configuracion en `src/environments/environment.ts` y `environment.prod.ts`.
+En **desarrollo** la configuracion esta en `src/environments/environment.ts`.
 
-El proxy de desarrollo (`proxy.conf.json`) redirige `/api/cubepath/` a `https://api.cubepath.com` para evitar CORS.
+En **produccion** el `dockerfile` usa `envsubst` para inyectar estas variables desde el `.env` que Dokploy escribe antes del build (via `src/environments/environment.template.ts`).
+
+El proxy de desarrollo (`proxy.conf.json`) redirige las rutas `/api/` para evitar CORS:
+
+| Ruta local | Destino |
+|-----------|---------|
+| `/api/webhook/` | `https://vps22899.cubepath.net/webhook/` |
+| `/api/webhook-test/` | `https://vps22899.cubepath.net/webhook-test/` |
+| `/api/cubepath/` | `https://api.cubepath.com/` |
+
+---
+
+## Despliegue en produccion con Dokploy
+
+### Prerequisitos
+
+- VPS con [Dokploy](https://dokploy.com) instalado (Docker Swarm activado)
+- Dominio apuntando al IP publico del VPS (ej: DuckDNS, Cloudflare, etc.)
+- Puerto 80 y 443 abiertos en el firewall del proveedor
+- Cuenta en Firebase con autenticacion configurada
+
+### 1. Verificar que Traefik esta corriendo
+
+Dokploy usa Traefik como proxy inverso. Verificar que el servicio existe:
+
+```bash
+docker service ls | grep traefik
+```
+
+Si **no aparece**, iniciarlo desde la UI de Dokploy: **Settings → Web Server → Start**, o manualmente:
+
+```bash
+docker service create \
+  --name dokploy-traefik \
+  --constraint 'node.role==manager' \
+  --mount type=bind,source=/var/run/docker.sock,destination=/var/run/docker.sock \
+  --mount type=bind,source=/etc/dokploy/traefik,destination=/etc/dokploy/traefik \
+  --publish published=80,target=80,mode=host \
+  --publish published=443,target=443,mode=host \
+  --network dokploy-network \
+  traefik:v3.1 \
+  --configFile=/etc/dokploy/traefik/traefik.yml
+```
+
+### 2. Crear la aplicacion en Dokploy
+
+1. Ir al panel de Dokploy (`http://IP-VPS:3000`)
+2. **Projects → New Project → New Application**
+3. Configurar el repositorio:
+   - **Provider:** GitHub
+   - **Repository:** `gromanssp/Agent-IA-DevOp`
+   - **Branch:** `main`
+   - **Build Type:** `Dockerfile`
+   - **Dockerfile path:** `dockerfile` (sin extension, minusculas)
+
+### 3. Configurar variables de entorno
+
+En la aplicacion → **Environment** → agregar cada variable:
+
+```env
+FIREBASE_API_KEY=AIzaSy...
+FIREBASE_AUTH_DOMAIN=tu-proyecto.firebaseapp.com
+FIREBASE_PROJECT_ID=tu-proyecto
+FIREBASE_STORAGE_BUCKET=tu-proyecto.firebasestorage.app
+FIREBASE_MESSAGING_SENDER_ID=123456789
+FIREBASE_APP_ID=1:123456789:web:abc123
+FIREBASE_MEASUREMENT_ID=G-XXXXXXX
+N8N_WEBHOOK_URL=/api/webhook/devops-agent
+CUBEPATH_API_URL=https://api.cubepath.com/v1/vps/
+```
+
+> **Nota:** `N8N_WEBHOOK_URL` debe incluir la ruta completa relativa. Nginx en el contenedor hace el proxy hacia el servidor de n8n.
+
+### 4. Forzar rebuild limpio (cache-bust)
+
+El `dockerfile` incluye un `ARG BUILD_DATE` para invalidar la cache de Docker cuando sea necesario. En Dokploy → **Build Arguments**:
+
+```
+BUILD_DATE=20260328-1200
+```
+
+Cambiar el valor para forzar un rebuild completo sin cache.
+
+### 5. Configurar el dominio con SSL
+
+En la aplicacion → **Domains → Add Domain**:
+
+| Campo | Valor |
+|-------|-------|
+| **Host** | `tu-dominio.duckdns.org` _(sin `https://`)_ |
+| **Port** | `80` |
+| **HTTPS** | Activado |
+| **Certificate** | Let's Encrypt |
+
+> **Importante:** El campo Host debe contener solo el hostname, **sin** `https://` ni `/`. Incluir el protocolo causa que Traefik falle al generar el certificado SSL.
+
+### 6. Desplegar
+
+En la aplicacion → **Deploy**. El proceso:
+
+1. Clona el repositorio
+2. Escribe el `.env` con las variables configuradas
+3. Ejecuta `docker build` usando el `dockerfile`
+4. El `dockerfile` inyecta las variables en `environment.ts` via `envsubst`
+5. Compila Angular con `ng build --configuration production`
+6. Sirve el bundle con Nginx Alpine
+
+### 7. Agregar dominio en Firebase Auth
+
+Para que Google Sign-In funcione con el dominio de produccion:
+
+1. Ir a [Firebase Console](https://console.firebase.google.com)
+2. **Authentication → Settings → Authorized domains**
+3. **Add domain:** `tu-dominio.duckdns.org`
+
+---
+
+## Solucion de problemas en produccion
+
+### El sitio no carga — socket reset
+
+Traefik intento generar el certificado SSL pero fallo (DNS no apuntaba al servidor en ese momento) y no reintenta automaticamente. Solucion:
+
+```bash
+# Escalar a 0 para detener Traefik
+docker service scale dokploy-traefik=0
+
+# Limpiar el certificado fallido
+cp /etc/dokploy/traefik/dynamic/acme.json /etc/dokploy/traefik/dynamic/acme.json.bak
+echo '{}' > /etc/dokploy/traefik/dynamic/acme.json
+chmod 600 /etc/dokploy/traefik/dynamic/acme.json
+
+# Reiniciar — Traefik genera el certificado desde cero
+docker service scale dokploy-traefik=1
+
+# Ver logs en tiempo real
+docker service logs -f dokploy-traefik
+```
+
+### Error: "Domain name contains an invalid character"
+
+El campo Host en Dokploy tiene `https://` incluido. Editar el dominio y dejarlo como solo `tu-dominio.duckdns.org`.
+
+### El build usa cache antigua / variables vacias
+
+Cambiar el valor de `BUILD_DATE` en Build Arguments de Dokploy y redesplegar. Esto invalida la capa de cache de Docker que ejecuta `envsubst`.
+
+### Ver logs del contenedor en produccion
+
+```bash
+# Ver logs del servicio en Docker Swarm
+docker service logs -f api-chat-agente-ia-de-devops-fkl2ub
+
+# Ver logs de Traefik
+docker service logs -f dokploy-traefik | grep -i "acme\|error\|certificate"
+
+# Estado de todos los servicios
+docker service ls
+```
+
+### Verificar el certificado SSL y DNS
+
+```bash
+# IP publica del servidor
+curl ifconfig.me
+
+# IP a la que apunta el dominio (deben coincidir)
+dig +short tu-dominio.duckdns.org
+```
 
 ---
 
@@ -231,7 +436,7 @@ El proxy de desarrollo (`proxy.conf.json`) redirige `/api/cubepath/` a `https://
 
 | Comando | Descripcion |
 |---------|-------------|
-| `npm start` | Servidor de desarrollo |
+| `npm start` | Servidor de desarrollo con proxy |
 | `npm run build` | Build de produccion |
 | `npm run watch` | Build en modo watch |
 | `npm test` | Ejecutar tests |

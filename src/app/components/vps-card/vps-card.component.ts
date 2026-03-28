@@ -21,8 +21,8 @@ export class VpsCardComponent {
       [VpsAction.POWER_OFF]: 'Apagar',
       [VpsAction.POWER_ON]: 'Encender',
       [VpsAction.METRICS]: 'Metricas',
-      [VpsAction.DELETE]: 'Eliminar',
-      [VpsAction.STATUS]: 'Estado',
+      // [VpsAction.DELETE]: 'Eliminar',
+      // [VpsAction.STATUS]: 'Estado',
       [VpsAction.UNKNOWN]: 'Desconocido',
     };
     return labels[this.action().action] ?? this.action().action;
@@ -36,8 +36,8 @@ export class VpsCardComponent {
       [VpsAction.POWER_OFF]: BadgeVariant.DANGER,
       [VpsAction.POWER_ON]: BadgeVariant.SUCCESS,
       [VpsAction.METRICS]: BadgeVariant.PRIMARY,
-      [VpsAction.DELETE]: BadgeVariant.DANGER,
-      [VpsAction.STATUS]: BadgeVariant.SECONDARY,
+      // [VpsAction.DELETE]: BadgeVariant.DANGER,
+      // [VpsAction.STATUS]: BadgeVariant.SECONDARY,
       [VpsAction.UNKNOWN]: BadgeVariant.SECONDARY,
     };
     return map[this.action().action] ?? BadgeVariant.SECONDARY;

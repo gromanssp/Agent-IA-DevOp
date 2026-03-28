@@ -2,16 +2,18 @@ import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
+import { NgOptimizedImage } from '@angular/common';
 
 @Component({
     selector: 'app-login',
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css'],
-    imports: [FormsModule, RouterLink]
+    imports: [FormsModule, RouterLink, NgOptimizedImage]
 })
 export class LoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
+  logoUrl = '../../../../aia.png';
 
   email = '';
   password = '';

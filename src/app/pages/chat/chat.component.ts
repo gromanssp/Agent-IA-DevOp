@@ -66,7 +66,7 @@ export class ChatComponent implements AfterViewChecked, OnInit, OnDestroy {
   suggestions = [
     '¿Cuántos VPS tengo activos?',
     'Reinicia el servidor de producción',
-    '¿Cuánta RAM tiene el VPS staging?',
+    'Muestrame los planes de VPS disponibles',
     'Muestra las metricas del VPS 22897',
   ];
 

@@ -8,7 +8,6 @@
 ![n8n](https://img.shields.io/badge/n8n-Webhook-EA4B71?logo=n8n)
 ![Chart.js](https://img.shields.io/badge/Chart.js-4.3-FF6384?logo=chartdotjs)
 ![Docker](https://img.shields.io/badge/Docker-Swarm-2496ED?logo=docker)
-![License](https://img.shields.io/badge/License-MIT-green)
 
 ---
 
@@ -273,19 +272,13 @@ El proxy de desarrollo (`proxy.conf.json`) redirige las rutas `/api/` para evita
 ### Prerequisitos
 
 - VPS con [Dokploy](https://dokploy.com) instalado (Docker Swarm activado)
-- Dominio apuntando al IP publico del VPS (ej: DuckDNS, Cloudflare, etc.)
+- Dominio apuntando al IP publico del VPS DuckDNS.
 - Puerto 80 y 443 abiertos en el firewall del proveedor
 - Cuenta en Firebase con autenticacion configurada
 
-### 1. Verificar que Traefik esta corriendo
+### 1. Al verificar que Traefik no esta presente
 
-Dokploy usa Traefik como proxy inverso. Verificar que el servicio existe:
-
-```bash
-docker service ls | grep traefik
-```
-
-Si **no aparece**, iniciarlo desde la UI de Dokploy: **Settings → Web Server → Start**, o manualmente:
+Si creo manualmente un contenedor:
 
 ```bash
 docker service create \
@@ -311,120 +304,34 @@ docker service create \
    - **Build Type:** `Dockerfile`
    - **Dockerfile path:** `dockerfile` (sin extension, minusculas)
 
-### 3. Configurar variables de entorno
+### 3. Configurar el dominio con SSL
 
-En la aplicacion → **Environment** → agregar cada variable:
-
-```env
-FIREBASE_API_KEY=AIzaSy...
-FIREBASE_AUTH_DOMAIN=tu-proyecto.firebaseapp.com
-FIREBASE_PROJECT_ID=tu-proyecto
-FIREBASE_STORAGE_BUCKET=tu-proyecto.firebasestorage.app
-FIREBASE_MESSAGING_SENDER_ID=123456789
-FIREBASE_APP_ID=1:123456789:web:abc123
-FIREBASE_MEASUREMENT_ID=G-XXXXXXX
-N8N_WEBHOOK_URL=/api/webhook/devops-agent
-CUBEPATH_API_URL=https://api.cubepath.com/v1/vps/
-```
-
-> **Nota:** `N8N_WEBHOOK_URL` debe incluir la ruta completa relativa. Nginx en el contenedor hace el proxy hacia el servidor de n8n.
-
-### 4. Forzar rebuild limpio (cache-bust)
-
-El `dockerfile` incluye un `ARG BUILD_DATE` para invalidar la cache de Docker cuando sea necesario. En Dokploy → **Build Arguments**:
-
-```
-BUILD_DATE=20260328-1200
-```
-
-Cambiar el valor para forzar un rebuild completo sin cache.
-
-### 5. Configurar el dominio con SSL
-
-En la aplicacion → **Domains → Add Domain**:
+En la aplicacion → **Domains → Add Domain** se aplico:
 
 | Campo | Valor |
 |-------|-------|
-| **Host** | `tu-dominio.duckdns.org` _(sin `https://`)_ |
+| **Host** | `agent-ia.duckdns.org` _(sin `https://`)_ |
 | **Port** | `80` |
 | **HTTPS** | Activado |
 | **Certificate** | Let's Encrypt |
 
-> **Importante:** El campo Host debe contener solo el hostname, **sin** `https://` ni `/`. Incluir el protocolo causa que Traefik falle al generar el certificado SSL.
-
-### 6. Desplegar
+### 4. Despliegue
 
 En la aplicacion → **Deploy**. El proceso:
 
 1. Clona el repositorio
-2. Escribe el `.env` con las variables configuradas
 3. Ejecuta `docker build` usando el `dockerfile`
 4. El `dockerfile` inyecta las variables en `environment.ts` via `envsubst`
 5. Compila Angular con `ng build --configuration production`
 6. Sirve el bundle con Nginx Alpine
 
-### 7. Agregar dominio en Firebase Auth
+### 5. Agregar dominio en Firebase Auth
 
 Para que Google Sign-In funcione con el dominio de produccion:
 
 1. Ir a [Firebase Console](https://console.firebase.google.com)
 2. **Authentication → Settings → Authorized domains**
 3. **Add domain:** `tu-dominio.duckdns.org`
-
----
-
-## Solucion de problemas en produccion
-
-### El sitio no carga — socket reset
-
-Traefik intento generar el certificado SSL pero fallo (DNS no apuntaba al servidor en ese momento) y no reintenta automaticamente. Solucion:
-
-```bash
-# Escalar a 0 para detener Traefik
-docker service scale dokploy-traefik=0
-
-# Limpiar el certificado fallido
-cp /etc/dokploy/traefik/dynamic/acme.json /etc/dokploy/traefik/dynamic/acme.json.bak
-echo '{}' > /etc/dokploy/traefik/dynamic/acme.json
-chmod 600 /etc/dokploy/traefik/dynamic/acme.json
-
-# Reiniciar — Traefik genera el certificado desde cero
-docker service scale dokploy-traefik=1
-
-# Ver logs en tiempo real
-docker service logs -f dokploy-traefik
-```
-
-### Error: "Domain name contains an invalid character"
-
-El campo Host en Dokploy tiene `https://` incluido. Editar el dominio y dejarlo como solo `tu-dominio.duckdns.org`.
-
-### El build usa cache antigua / variables vacias
-
-Cambiar el valor de `BUILD_DATE` en Build Arguments de Dokploy y redesplegar. Esto invalida la capa de cache de Docker que ejecuta `envsubst`.
-
-### Ver logs del contenedor en produccion
-
-```bash
-# Ver logs del servicio en Docker Swarm
-docker service logs -f api-chat-agente-ia-de-devops-fkl2ub
-
-# Ver logs de Traefik
-docker service logs -f dokploy-traefik | grep -i "acme\|error\|certificate"
-
-# Estado de todos los servicios
-docker service ls
-```
-
-### Verificar el certificado SSL y DNS
-
-```bash
-# IP publica del servidor
-curl ifconfig.me
-
-# IP a la que apunta el dominio (deben coincidir)
-dig +short tu-dominio.duckdns.org
-```
 
 ---
 

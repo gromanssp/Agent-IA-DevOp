@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { SidebarService } from './sidebar.service';
-import { first } from 'rxjs';
+
+// SidebarService uses Angular Signals — tests read signal values directly via ()
+// instead of subscribing to Observables.
 
 describe('SidebarService', () => {
   let service: SidebarService;
@@ -14,84 +16,57 @@ describe('SidebarService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should start expanded (not collapsed)', (done) => {
-    service.collapsed$.pipe(first()).subscribe(val => {
-      expect(val).toBeFalse();
-      done();
-    });
+  it('should start expanded (collapsed = false)', () => {
+    expect(service.collapsed()).toBeFalse();
   });
 
-  it('should toggle collapsed state', (done) => {
+  it('should toggle to collapsed', () => {
     service.toggle();
-    service.collapsed$.pipe(first()).subscribe(val => {
-      expect(val).toBeTrue();
-      done();
-    });
+    expect(service.collapsed()).toBeTrue();
   });
 
-  it('should toggle back to expanded', (done) => {
+  it('should toggle back to expanded', () => {
     service.toggle();
     service.toggle();
-    service.collapsed$.pipe(first()).subscribe(val => {
-      expect(val).toBeFalse();
-      done();
-    });
+    expect(service.collapsed()).toBeFalse();
   });
 
-  it('should collapse', (done) => {
+  it('should collapse', () => {
     service.collapse();
-    service.collapsed$.pipe(first()).subscribe(val => {
-      expect(val).toBeTrue();
-      done();
-    });
+    expect(service.collapsed()).toBeTrue();
   });
 
-  it('should expand', (done) => {
+  it('should expand after collapse', () => {
     service.collapse();
     service.expand();
-    service.collapsed$.pipe(first()).subscribe(val => {
-      expect(val).toBeFalse();
-      done();
-    });
+    expect(service.collapsed()).toBeFalse();
   });
 
-  it('should report isCollapsed correctly', () => {
-    expect(service.isCollapsed).toBeFalse();
+  it('should report isCollapsed correctly via computed signal', () => {
+    expect(service.isCollapsed()).toBeFalse();
     service.toggle();
-    expect(service.isCollapsed).toBeTrue();
+    expect(service.isCollapsed()).toBeTrue();
     service.toggle();
-    expect(service.isCollapsed).toBeFalse();
+    expect(service.isCollapsed()).toBeFalse();
   });
 
-  it('should start with mobile closed', (done) => {
-    service.mobileOpen$.pipe(first()).subscribe(val => {
-      expect(val).toBeFalse();
-      done();
-    });
+  it('should start with mobile closed', () => {
+    expect(service.mobileOpen()).toBeFalse();
   });
 
-  it('should toggle mobile open state', (done) => {
+  it('should toggle mobile open', () => {
     service.toggleMobile();
-    service.mobileOpen$.pipe(first()).subscribe(val => {
-      expect(val).toBeTrue();
-      done();
-    });
+    expect(service.mobileOpen()).toBeTrue();
   });
 
-  it('should open mobile', (done) => {
+  it('should open mobile', () => {
     service.openMobile();
-    service.mobileOpen$.pipe(first()).subscribe(val => {
-      expect(val).toBeTrue();
-      done();
-    });
+    expect(service.mobileOpen()).toBeTrue();
   });
 
-  it('should close mobile', (done) => {
+  it('should close mobile', () => {
     service.openMobile();
     service.closeMobile();
-    service.mobileOpen$.pipe(first()).subscribe(val => {
-      expect(val).toBeFalse();
-      done();
-    });
+    expect(service.mobileOpen()).toBeFalse();
   });
 });

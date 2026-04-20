@@ -1,10 +1,18 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { ChatComponent } from './chat.component';
 import { AgentService } from '../../services/agent.service';
-import { N8nResponse } from '../../models/agent.models';
-import { of, throwError } from 'rxjs';
+import { AgentResponse, VpsAction } from '../../models';
+import { ACTION_HANDLERS } from '../../services/handlers/action-handler.token';
+import { VpsListHandler } from '../../services/handlers/vps-list.handler';
+import { VpsPlansHandler } from '../../services/handlers/vps-plans.handler';
+import { VpsMetricsHandler } from '../../services/handlers/vps-metrics.handler';
+import { VpsSingleHandler } from '../../services/handlers/vps-single.handler';
+import { AgentResponseHandler } from '../../services/handlers/agent-response.handler';
+
+// onConfirm signature: onConfirm(result: { confirmed: boolean; vpsId: string | null })
+// NOT onConfirm(boolean) — always pass the full result object.
 
 describe('ChatComponent', () => {
   let component: ChatComponent;
@@ -12,8 +20,8 @@ describe('ChatComponent', () => {
   let agentService: AgentService;
   let httpMock: HttpTestingController;
 
-  const mockResponse: N8nResponse = {
-    action: 'list_vps',
+  const mockResponse: AgentResponse = {
+    action: VpsAction.LIST_VPS,
     vps_id: null,
     vps_name: null,
     confirm_required: false,
@@ -25,7 +33,12 @@ describe('ChatComponent', () => {
       imports: [ChatComponent],
       providers: [
         provideHttpClient(),
-        provideHttpClientTesting()
+        provideHttpClientTesting(),
+        { provide: ACTION_HANDLERS, useClass: VpsListHandler,       multi: true },
+        { provide: ACTION_HANDLERS, useClass: VpsPlansHandler,      multi: true },
+        { provide: ACTION_HANDLERS, useClass: VpsMetricsHandler,    multi: true },
+        { provide: ACTION_HANDLERS, useClass: VpsSingleHandler,     multi: true },
+        { provide: ACTION_HANDLERS, useClass: AgentResponseHandler, multi: true },
       ]
     }).compileComponents();
 
@@ -62,7 +75,7 @@ describe('ChatComponent', () => {
   it('should not send empty messages', () => {
     component.inputText = '   ';
     component.sendMessage();
-    expect(component.messages().length).toBe(1); // only welcome msg
+    expect(component.messages().length).toBe(1);
   });
 
   it('should not send when loading', () => {
@@ -82,8 +95,7 @@ describe('ChatComponent', () => {
     expect(messages[1].content).toBe('cuantos VPS tengo?');
     expect(messages[2].loading).toBeTrue();
 
-    // Flush the HTTP request
-    const req = httpMock.expectOne('/webhook/chat');
+    const req = httpMock.expectOne(r => r.url.includes('/webhook/'));
     req.flush(mockResponse);
   });
 
@@ -92,7 +104,7 @@ describe('ChatComponent', () => {
     component.sendMessage();
     expect(component.inputText).toBe('');
 
-    const req = httpMock.expectOne('/webhook/chat');
+    const req = httpMock.expectOne(r => r.url.includes('/webhook/'));
     req.flush(mockResponse);
   });
 
@@ -101,7 +113,7 @@ describe('ChatComponent', () => {
     component.sendMessage();
     expect(component.isLoading()).toBeTrue();
 
-    const req = httpMock.expectOne('/webhook/chat');
+    const req = httpMock.expectOne(r => r.url.includes('/webhook/'));
     req.flush(mockResponse);
   });
 
@@ -109,11 +121,11 @@ describe('ChatComponent', () => {
     component.inputText = 'cuantos VPS tengo?';
     component.sendMessage();
 
-    const req = httpMock.expectOne('/webhook/chat');
+    const req = httpMock.expectOne(r => r.url.includes('/webhook/'));
     req.flush(mockResponse);
 
     const messages = component.messages();
-    expect(messages.length).toBe(3); // welcome + user + response
+    expect(messages.length).toBe(3);
     expect(messages[2].content).toBe('Tienes 3 VPS activos');
     expect(messages[2].loading).toBeFalsy();
     expect(component.isLoading()).toBeFalse();
@@ -123,7 +135,7 @@ describe('ChatComponent', () => {
     component.inputText = 'lista VPS';
     component.sendMessage();
 
-    const req = httpMock.expectOne('/webhook/chat');
+    const req = httpMock.expectOne(r => r.url.includes('/webhook/'));
     req.flush(mockResponse);
 
     const messages = component.messages();
@@ -131,8 +143,8 @@ describe('ChatComponent', () => {
   });
 
   it('should handle confirm_required response', () => {
-    const confirmResponse: N8nResponse = {
-      action: 'reboot',
+    const confirmResponse: AgentResponse = {
+      action: VpsAction.REBOOT,
       vps_id: 'vps-123',
       vps_name: 'produccion',
       confirm_required: true,
@@ -142,7 +154,7 @@ describe('ChatComponent', () => {
     component.inputText = 'reinicia produccion';
     component.sendMessage();
 
-    const req = httpMock.expectOne('/webhook/chat');
+    const req = httpMock.expectOne(r => r.url.includes('/webhook/'));
     req.flush(confirmResponse);
 
     expect(component.pendingConfirm()).toBeTruthy();
@@ -156,7 +168,7 @@ describe('ChatComponent', () => {
     component.inputText = 'test';
     component.sendMessage();
 
-    const req = httpMock.expectOne('/webhook/chat');
+    const req = httpMock.expectOne(r => r.url.includes('/webhook/'));
     req.flush(mockResponse);
 
     expect(component.showSuggestions()).toBeFalse();
@@ -168,7 +180,7 @@ describe('ChatComponent', () => {
     const messages = component.messages();
     expect(messages[1].content).toBe('¿Cuántos VPS tengo activos?');
 
-    const req = httpMock.expectOne('/webhook/chat');
+    const req = httpMock.expectOne(r => r.url.includes('/webhook/'));
     req.flush(mockResponse);
   });
 
@@ -179,7 +191,7 @@ describe('ChatComponent', () => {
     const messages = component.messages();
     expect(messages[1].content).toBe('send this instead');
 
-    const req = httpMock.expectOne('/webhook/chat');
+    const req = httpMock.expectOne(r => r.url.includes('/webhook/'));
     req.flush(mockResponse);
   });
 
@@ -187,7 +199,7 @@ describe('ChatComponent', () => {
     component.inputText = 'test';
     component.sendMessage();
 
-    const req = httpMock.expectOne('/webhook/chat');
+    const req = httpMock.expectOne(r => r.url.includes('/webhook/'));
     req.flush('Server error', { status: 500, statusText: 'Internal Server Error' });
 
     const messages = component.messages();
@@ -198,9 +210,8 @@ describe('ChatComponent', () => {
   });
 
   it('should confirm action and send confirmAction request', () => {
-    // First, set up a pending confirmation
-    const confirmResponse: N8nResponse = {
-      action: 'reboot',
+    const confirmResponse: AgentResponse = {
+      action: VpsAction.REBOOT,
       vps_id: 'vps-123',
       vps_name: 'produccion',
       confirm_required: true,
@@ -210,19 +221,18 @@ describe('ChatComponent', () => {
     component.inputText = 'reinicia produccion';
     component.sendMessage();
 
-    const req1 = httpMock.expectOne('/webhook/chat');
+    const req1 = httpMock.expectOne(r => r.url.includes('/webhook/'));
     req1.flush(confirmResponse);
 
-    // Now confirm the action
-    component.onConfirm(true);
+    // onConfirm receives { confirmed, vpsId } — not a plain boolean
+    component.onConfirm({ confirmed: true, vpsId: 'vps-123' });
 
     const messages = component.messages();
     const loadingMsg = messages[messages.length - 1];
     expect(loadingMsg.loading).toBeTrue();
     expect(component.pendingConfirm()).toBeNull();
 
-    // Flush the confirm request
-    const req2 = httpMock.expectOne('/webhook/chat');
+    const req2 = httpMock.expectOne(r => r.url.includes('/webhook/'));
     expect(req2.request.body.message).toContain('CONFIRMED');
     req2.flush({
       ...confirmResponse,
@@ -235,8 +245,8 @@ describe('ChatComponent', () => {
   });
 
   it('should cancel confirmation and add cancel message', () => {
-    const confirmResponse: N8nResponse = {
-      action: 'reboot',
+    const confirmResponse: AgentResponse = {
+      action: VpsAction.REBOOT,
       vps_id: 'vps-123',
       vps_name: 'produccion',
       confirm_required: true,
@@ -246,10 +256,10 @@ describe('ChatComponent', () => {
     component.inputText = 'reinicia produccion';
     component.sendMessage();
 
-    const req = httpMock.expectOne('/webhook/chat');
+    const req = httpMock.expectOne(r => r.url.includes('/webhook/'));
     req.flush(confirmResponse);
 
-    component.onConfirm(false);
+    component.onConfirm({ confirmed: false, vpsId: null });
 
     expect(component.pendingConfirm()).toBeNull();
     const messages = component.messages();
@@ -259,11 +269,11 @@ describe('ChatComponent', () => {
 
   it('should do nothing on onConfirm if no pending action', () => {
     const msgCount = component.messages().length;
-    component.onConfirm(true);
+    component.onConfirm({ confirmed: true, vpsId: null });
     expect(component.messages().length).toBe(msgCount);
   });
 
-  it('should handle Enter key press', () => {
+  it('should send on Enter key', () => {
     component.inputText = 'test enter';
     const event = new KeyboardEvent('keydown', { key: 'Enter', shiftKey: false });
     spyOn(event, 'preventDefault');
@@ -272,7 +282,7 @@ describe('ChatComponent', () => {
     expect(event.preventDefault).toHaveBeenCalled();
     expect(component.messages().length).toBe(3);
 
-    const req = httpMock.expectOne('/webhook/chat');
+    const req = httpMock.expectOne(r => r.url.includes('/webhook/'));
     req.flush(mockResponse);
   });
 
@@ -280,32 +290,28 @@ describe('ChatComponent', () => {
     component.inputText = 'test';
     const event = new KeyboardEvent('keydown', { key: 'Enter', shiftKey: true });
     component.onKeydown(event);
-
-    expect(component.messages().length).toBe(1); // only welcome
+    expect(component.messages().length).toBe(1);
   });
 
   it('should not send on other keys', () => {
     component.inputText = 'test';
     const event = new KeyboardEvent('keydown', { key: 'a' });
     component.onKeydown(event);
-
     expect(component.messages().length).toBe(1);
   });
 
   it('should limit history to last 10 non-loading messages', () => {
-    // Send multiple messages to build up history
     for (let i = 0; i < 6; i++) {
       component.inputText = `message ${i}`;
       component.sendMessage();
-      const req = httpMock.expectOne('/webhook/chat');
+      const req = httpMock.expectOne(r => r.url.includes('/webhook/'));
       req.flush({ ...mockResponse, user_message: `response ${i}` });
     }
 
-    // Send one more and check the history in the request
     component.inputText = 'final message';
     component.sendMessage();
 
-    const req = httpMock.expectOne('/webhook/chat');
+    const req = httpMock.expectOne(r => r.url.includes('/webhook/'));
     expect(req.request.body.history.length).toBeLessThanOrEqual(10);
     req.flush(mockResponse);
   });

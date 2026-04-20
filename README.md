@@ -331,7 +331,7 @@ Para que Google Sign-In funcione con el dominio de produccion:
 
 1. Ir a [Firebase Console](https://console.firebase.google.com)
 2. **Authentication → Settings → Authorized domains**
-3. **Add domain:** `tu-dominio.duckdns.org`
+3. **Add domain:** `angent-ia.duckdns.org`
 
 ---
 
